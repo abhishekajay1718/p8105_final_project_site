@@ -1,0 +1,60 @@
+---
+title: "Tentative_report"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    css: style.css
+---
+
+###Motivation:
+
+A major concern in emergency medical services (EMS) planning has been the need to minimize response time to better patient outcome, translated by some EMS operations into a goal of a response time of 8 minutes or less for advanced life support (ALS) units responding to life-threatening events. An exploratory analysis suggested there may be a small beneficial effect of response ≤7 minutes 59 seconds for those who survived to become an inpatient. More information on this can be found [here](https://www.ncbi.nlm.nih.gov/pubmed/11927452) and [here](https://www.ncbi.nlm.nih.gov/pubmed/22026820)
+
+Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. Hence, we decided to analyse the EMS response time in New York City in the year 2017 with respect to weather and street blockage so as to improve it.
+
+
+
+
+###About the data:
+
+__Incidents Responded to by Fire Companies:__
+[https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd] 
+This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is __response time__ which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.
+
+
+__The New York City Weather Data__ [https://www.ncdc.noaa.gov/cdo-web/datasets] 
+
+This dataset includes weather records of the city from 2014- 2018. We have restrcited our analysis to 2017 so the data was filtered accordingly. From this dataset, we have selected _precipication_, _snow_, _snow depth_ and _maximum and minimum temperatures_ everyday throughout the year.
+
+
+__Street Closure due to Construction data__ :
+[https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk]
+For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.
+
+Additionally, since our data contained only zip code, we matched the neighbourhood table given [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes.
+
+
+Since these datasets were obtained from different sources, incident data and weather data were merged together by the "date" variable. Further, incident data was seperated into day,month and year variables which helped us categorise different seasons by month, time of day(morning, evening etc.). A seperate variable was name categorizing response time above or below 8 mins since it is generally accepted within the field that an 'ideal' response time for emergency calls would be within eight minutes, ninety-percent of the time. Precipitation from weather data was also categorized into high, medium and low to conduct our analysis on.
+
+
+###Questions that drove our analysis:
+* How is the response time affected by the weather specifically when it is snowing or raining or by seasons?
+
+* How often does the EMS arrive within ideal time(8mins)?
+
+* How is different during different times of the day?
+
+
+*  [This](https://www.ncbi.nlm.nih.gov/pubmed/29381111) study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. So we thought what is the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
+
+
+
+
+###Limitations of our analysis:
+
+
+* response time 'clock' almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.
+
+
+

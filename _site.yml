@@ -1,0 +1,25 @@
+name: "P8104_final_project"
+output_dir: "."
+navbar:
+  title: "Home"
+  right:
+    - text: "Report"
+      href: tentative_report.html
+    - text: "Data Dashboard"
+      href: flexdashboard.html
+    - text: "EDA"
+      href: EDA.html
+    - text: "Statistical Analysis"
+      href: statistical_analysis.html
+    - text: "About"
+      href: about.html
+    - icon: fa-envelope fa-lg
+      href: mailto:<abhishek.ajay@columbia.edu>
+    - icon: fa-github fa-lg
+      href: https://github.com/dewyork/P8105_final_project
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: journal
+    css: style.css
