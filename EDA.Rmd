@@ -6,9 +6,32 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r finaldata}
+```{r finaldata, include = FALSE}
 load('data/finaldat.RData')
+
+finaldat = 
+  finaldat =  
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:12, "morning",
+           ifelse(hour %in% 13:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         prcp_ctg = 
+           ifelse(prcp == 0, "NA",
+           ifelse((prcp > 0 & prcp <= 25), "low",
+           ifelse((prcp > 25 & prcp <= 60), "medium", "high")))) %>% 
+  select(-over_5min)
 ```
+
