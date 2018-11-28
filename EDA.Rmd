@@ -14,7 +14,6 @@ knitr::opts_chunk$set(echo = TRUE)
 load('data/finaldat.RData')
 
 finaldat = 
-  finaldat =  
   finaldat %>%
   mutate(season = 
            ifelse(incident_month %in% 9:11, "Fall",
@@ -25,13 +24,142 @@ finaldat =
            ifelse(hour %in% 13:17, "afternoon",
            ifelse(hour %in% 18:23, "night","dawn"))), 
          over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
          prcp_ctg = 
-           ifelse(prcp == 0, "NA",
+           ifelse(prcp == 0, "no_prcp",
            ifelse((prcp > 0 & prcp <= 25), "low",
-           ifelse((prcp > 25 & prcp <= 60), "medium", "high")))) %>% 
+           ifelse((prcp > 25 & prcp <= 60), "medium", "high"))),
+         over_8min = fct_relevel(over_8min, "8min-")) %>% 
   select(-over_5min)
+```
+
+## Logistic regression with binary outcome 8min- / 8min+
+```{r}
+finaldat = 
+  finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
+         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
+         season = fct_relevel(season, "Spring"),
+         hour_of_day = fct_relevel(hour_of_day, "night"))
+
+fit_logistic =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
+      family = binomial(), data = finaldat)
+
+summary(fit_logistic)
+
+OR_total = 
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = fct_reorder(term, OR)) %>% 
+  ggplot(aes(x = term, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
+                color = "darkred") +
+  scale_y_continuous(limits = c(0.5, 1.8)) +
+  labs(
+    x = " ",
+    y = " "
+  ) +
+  coord_flip() +
+  geom_hline(yintercept = 1.0, color = "blue") +
+  theme_bw()
+
+
+OR_hour_of_day =
+fit_logistic %>% 
+  broom::tidy() %>% 
+  filter(str_detect(term, "hour_of_day")) %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = fct_reorder(term, OR)) %>% 
+  ggplot(aes(x = term, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
+                color = "darkred") +
+  labs(
+    x = " ",
+    y = " "
+  ) +
+  coord_flip() +
+  geom_hline(yintercept = 1.0, color = "blue") +
+  theme_bw()
+
+OR_prcp = 
+fit_logistic %>% 
+  broom::tidy() %>% 
+  filter(str_detect(term, "prcp_ctg")) %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = fct_reorder(term, OR)) %>% 
+  ggplot(aes(x = term, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
+                color = "darkred") +
+  labs(
+    x = " ",
+    y = " "
+  ) +
+  coord_flip() +
+  geom_hline(yintercept = 1.0, color = "blue") +
+  theme_bw() 
+
+
+OR_snow =
+fit_logistic %>% 
+  broom::tidy() %>% 
+  filter(str_detect(term, "snow_ctg")) %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = fct_reorder(term, OR)) %>% 
+  ggplot(aes(x = term, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
+                color = "darkred") +
+  labs(
+    x = " ",
+    y = " "
+  ) +
+  coord_flip() +
+  geom_hline(yintercept = 1.0, color = "blue") +
+  theme_bw()
+
+
+OR_season =
+fit_logistic %>% 
+  broom::tidy() %>% 
+  filter(str_detect(term, "season")) %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = fct_reorder(term, OR)) %>% 
+  ggplot(aes(x = term, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
+                color = "darkred") +
+  labs(
+    x = " ",
+    y = " "
+  ) +
+  coord_flip() +
+  geom_hline(yintercept = 1.0, color = "blue") +
+  theme_bw()
+
 ```
 
