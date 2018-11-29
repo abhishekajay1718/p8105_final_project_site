@@ -1,12 +1,15 @@
 ---
-title: "EDA"
+title: "Exploratory Data Analysis"
 author: "Youn Kyeong Chang (uni# yc3242)"
 date: "November 28, 2018"
 output: html_document
 ---
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(patchwork)
 knitr::opts_chunk$set(echo = TRUE)
+
+theme_set(theme_bw())
 ```
 
 ```{r finaldata, include = FALSE}
@@ -19,8 +22,8 @@ finaldat =
            ifelse(incident_month %in% c(12,1,2), "Winter",
            ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
          hour_of_day = 
-           ifelse(hour %in% 6:12, "morning",
-           ifelse(hour %in% 13:17, "afternoon",
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
            ifelse(hour %in% 18:23, "night","dawn"))), 
          over_8min = ifelse(response_time > 8, "8min+", "8min-"),
          prcp_ctg = 
@@ -34,20 +37,21 @@ finaldat =
 ```
 
 
-## (1) Mean response time in rainy condition
-
 ```{r}
+prcp_eda =
 finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>% 
   group_by(date, prcp_ctg) %>% 
   summarise(mean_resp_time = mean(response_time)) %>% 
   ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
-  geom_violin(aes(fill = prcp_ctg), alpha = .5) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
     title = "Mean response time in rainy conditions",
-    y = "Mean response time",
-    x = "Precipitation"
+    y = "Mean response time (min)",
+    x = " "
   ) +
+  scale_x_discrete(labels = c("No precipitation", "Low precipitation", "High precipitation")) +
   viridis::scale_fill_viridis(
     name = "Precipitation",
     discrete = TRUE) +
@@ -55,21 +59,21 @@ finaldat %>%
         strip.background = element_rect(fill = "black"),
         strip.text = element_text(color = "white", face = "bold"),
         legend.position = "None") 
-```
 
-## (2) Mean response time in snowy condition
-```{r}
-finaldat %>% 
+snow_eda =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>% 
   group_by(date, snow_ctg) %>% 
   summarise(mean_resp_time = mean(response_time)) %>% 
   ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
-  geom_violin(aes(fill = snow_ctg), alpha = .5) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
     title = "Mean response time in snowy conditions",
-    y = "Mean response time",
-    x = "Snow"
+    y = "",
+    x = " "
   ) +
+  scale_x_discrete(labels = c("No snow", "Low snow", "High snow")) +
   viridis::scale_fill_viridis(
     name = "Snow",
     discrete = TRUE) +
@@ -77,20 +81,23 @@ finaldat %>%
         strip.background = element_rect(fill = "black"),
         strip.text = element_text(color = "white", face = "bold"),
         legend.position = "None") 
+
+prcp_eda + snow_eda
 ```
 
-## (3) Mean response time by season
+
 ```{r}
 finaldat %>% 
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
   group_by(date, season) %>% 
   summarise(mean_resp_time = mean(response_time)) %>% 
   ggplot(aes(x = season, y = mean_resp_time)) +
-  geom_violin(aes(fill = season), alpha = .5) +
+  geom_violin(aes(fill = season), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
     title = "Mean response time by season",
-    y = "Mean response time",
-    x = "season"
+    y = "Mean response time (min)",
+    x = " "
   ) +
   viridis::scale_fill_viridis(
     name = "season",
@@ -102,15 +109,17 @@ finaldat %>%
 ```
 
 
-## (2) Response time (smoothed line) by hour of the day
-
 ```{r}
 finaldat %>%
   group_by(hour) %>% 
   ggplot(aes(x = hour, y = response_time)) + 
-  geom_smooth(se = FALSE) +
-  labs(x = "Hour of the day", y = "Mean response time") +
-  geom_vline(xintercept = c(6, 13, 18), color = "green") +
+  geom_smooth(se = FALSE, color = "darkred") +
+  scale_x_continuous(breaks = c(6, 12, 18)) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkblue") +
+  labs(
+    x = "Hour of the day", 
+    y = "Mean response time (min)",
+    title = "Mean response time across a day") +
   theme_bw()
 ```
 
