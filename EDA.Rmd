@@ -4,7 +4,6 @@ author: "Youn Kyeong Chang (uni# yc3242)"
 date: "November 28, 2018"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
@@ -30,136 +29,91 @@ finaldat =
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
-         prcp_ctg = 
-           ifelse(prcp == 0, "no_prcp",
-           ifelse((prcp > 0 & prcp <= 25), "low",
-           ifelse((prcp > 25 & prcp <= 60), "medium", "high"))),
          over_8min = fct_relevel(over_8min, "8min-")) %>% 
   select(-over_5min)
 ```
 
-## Logistic regression with binary outcome 8min- / 8min+
+
+## (1) Mean response time in rainy condition
+
 ```{r}
-finaldat = 
-  finaldat %>% 
-  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
-         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
-         season = fct_relevel(season, "Spring"),
-         hour_of_day = fct_relevel(hour_of_day, "night"))
-
-fit_logistic =
-  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
-      family = binomial(), data = finaldat)
-
-summary(fit_logistic)
-
-OR_total = 
-fit_logistic %>% 
-  broom::tidy() %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  scale_y_continuous(limits = c(0.5, 1.8)) +
+finaldat %>% 
+  group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .5) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
-    x = " ",
-    y = " "
+    title = "Mean response time in rainy conditions",
+    y = "Mean response time",
+    x = "Precipitation"
   ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
-
-OR_hour_of_day =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "hour_of_day")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
-OR_prcp = 
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "prcp_ctg")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw() 
-
-
-OR_snow =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "snow_ctg")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
-
-OR_season =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "season")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
+  viridis::scale_fill_viridis(
+    name = "Precipitation",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(color = "white", face = "bold"),
+        legend.position = "None") 
 ```
+
+## (2) Mean response time in snowy condition
+```{r}
+finaldat %>% 
+  group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .5) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Mean response time in snowy conditions",
+    y = "Mean response time",
+    x = "Snow"
+  ) +
+  viridis::scale_fill_viridis(
+    name = "Snow",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(color = "white", face = "bold"),
+        legend.position = "None") 
+```
+
+## (3) Mean response time by season
+```{r}
+finaldat %>% 
+  group_by(date, season) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = season, y = mean_resp_time)) +
+  geom_violin(aes(fill = season), alpha = .5) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Mean response time by season",
+    y = "Mean response time",
+    x = "season"
+  ) +
+  viridis::scale_fill_viridis(
+    name = "season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(color = "white", face = "bold"),
+        legend.position = "None") 
+```
+
+
+## (2) Response time (smoothed line) by hour of the day
+
+```{r}
+finaldat %>%
+  group_by(hour) %>% 
+  ggplot(aes(x = hour, y = response_time)) + 
+  geom_smooth(se = FALSE) +
+  labs(x = "Hour of the day", y = "Mean response time") +
+  geom_vline(xintercept = c(6, 13, 18), color = "green") +
+  theme_bw()
+```
+
+
+
 

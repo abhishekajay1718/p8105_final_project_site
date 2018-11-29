@@ -30,10 +30,6 @@ finaldat =
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
-         prcp_ctg = 
-           ifelse(prcp == 0, "no_prcp",
-           ifelse((prcp > 0 & prcp <= 25), "low",
-           ifelse((prcp > 25 & prcp <= 60), "medium", "high"))),
          over_8min = fct_relevel(over_8min, "8min-")) %>% 
   select(-over_5min)
 ```
