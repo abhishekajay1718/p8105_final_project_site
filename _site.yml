@@ -8,9 +8,9 @@ navbar:
     - text: "Data Dashboard"
       href: flexdashboard.html
     - text: "EDA"
-      href: EDA.html
+      href: EDA_site.html
     - text: "Statistical Analysis"
-      href: statistical_analysis.html
+      href: statistical_analysis_site.html
     - text: "About"
       href: about.html
     - icon: fa-envelope fa-lg
