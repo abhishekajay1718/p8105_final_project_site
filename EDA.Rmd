@@ -57,9 +57,7 @@ finaldat %>%
     discrete = TRUE) +
   theme(plot.title = element_text(size = 9),
         axis.title.y = element_text(size = 7),
-        axis.title.x = element_text(size = 5),
-        strip.background = element_rect(fill = "black"),
-        strip.text = element_text(color = "white", face = "bold"),
+        axis.text.x = element_text(size = 6),
         legend.position = "None") 
 
 snow_eda =
@@ -81,9 +79,7 @@ snow_eda =
     discrete = TRUE) +
   theme(plot.title = element_text(size = 9),
         axis.title.y = element_text(size = 7),
-        axis.title.x = element_text(size = 5),
-        strip.background = element_rect(fill = "black"),
-        strip.text = element_text(color = "white", face = "bold"),
+        axis.text.x = element_text(size = 6),
         legend.position = "None") 
 
 prcp_snow = prcp_eda + snow_eda
@@ -93,6 +89,7 @@ ggsave("prcp_snow.png", plot = prcp_snow)
 
 
 ```{r}
+season_eda =
 finaldat %>% 
   mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
   group_by(date, season) %>% 
@@ -101,32 +98,41 @@ finaldat %>%
   geom_violin(aes(fill = season), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
-    title = "Mean response time by season",
+    title = "Season",
     y = "Mean response time (min)",
     x = " "
   ) +
   viridis::scale_fill_viridis(
     name = "season",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 12),
-        strip.background = element_rect(fill = "black"),
-        strip.text = element_text(color = "white", face = "bold"),
+  theme(plot.title = element_text(size = 11),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 8),
         legend.position = "None") 
+
+ggsave("season.png", plot = season_eda)
 ```
 
 
 ```{r}
+hour_eda =
 finaldat %>%
   group_by(hour) %>% 
   ggplot(aes(x = hour, y = response_time)) + 
   geom_smooth(se = FALSE, color = "darkred") +
-  scale_x_continuous(breaks = c(6, 12, 18)) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
   geom_vline(xintercept = c(6, 12, 18), color = "darkblue") +
   labs(
-    x = "Hour of the day", 
+    x = " ", 
     y = "Mean response time (min)",
-    title = "Mean response time across a day") +
-  theme_bw()
+    title = "Over a day") +
+  theme(plot.title = element_text(size = 11),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 8),
+        legend.position = "None") 
+
+ggsave("hour.png", plot = hour_eda)
 ```
 
 
