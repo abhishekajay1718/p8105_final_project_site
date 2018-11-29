@@ -89,156 +89,107 @@ fit_logistic %>%
                      "Afternoon", "Dawn", "Morning",
                      "50(mm)+", "0-50(mm)",
                      "25(mm)+", "0-25(mm)"),
-         sub_ctg = c("1", "2", "1", "3", "8", "6", "7", "5", "4", "5", "4")) %>%   filter(ctg != "intercept")  
-  
+         sub_ctg = c("1", "2", "1", "3", "8", "6", "7", "5", "4", "5", "4")) %>%   
+  filter(ctg != "intercept")  
+
 adj = .2 # This is used in position_nudge to move the dots
 
-ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg)) +
-  geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") +
+OR =
+ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg, 
+                        label = sub_ctg_chr)) +
+  geom_vline(aes(xintercept = 1), size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1.5), size = .6, linetype = "dashed") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "1"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "1"),
+            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
-             size = 4, color = "steelblue1",
+             size = 6, color = "seagreen4",
              position = position_nudge(y = adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "2"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "2"),
+            aes(label = sub_ctg_chr), colour = "indianred4", 
+            nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "2"), 
-             size = 4, color = "gray") +
+             size = 6, color = "indianred4") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
-  geom_point(data = filter(OR_total_df, sub_ctg == "3"), size = 4, 
+  geom_text(data = filter(OR_total_df, sub_ctg == "3"),
+            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "3"), 
+             size = 6, color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "4"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
-                 color = "gray50", position = position_nudge(y = +adj)) +
+                 color = "gray50", position = position_nudge(y = +.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "4"),
+            aes(label = sub_ctg_chr), colour = "skyblue2", 
+            nudge_x = -.22, nudge_y = +.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
-             size = 4, color = "skyblue",
-             position = position_nudge(y = +adj)) +
+             size = 6, color = "skyblue2",
+             position = position_nudge(y = +.1)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "5"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
-                 color = "gray50", position = position_nudge(y = -adj)) +
+                 color = "gray50", position = position_nudge(y = -.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "5"),
+            aes(label = sub_ctg_chr), colour = "skyblue4", 
+            nudge_x = -.25, nudge_y = -.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
-             size = 4, color = "skyblue4", 
-             position = position_nudge(y = -adj)) +
-  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
+             size = 6, color = "skyblue4", 
+             position = position_nudge(y = -.1)) +
+ geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "6"),
+            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            nudge_x = -.14, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
-             size = 4, color = "steelblue1",
+             size = 6, color = "seagreen4",
              position = position_nudge(y = adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "7"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "7"),
+            aes(label = sub_ctg_chr), colour = "indianred4", 
+            nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
-             size = 4, color = "gray") +
-   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
+             size = 6, color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
-  geom_point(data = filter(OR_total_df, sub_ctg == "8"), size = 4, 
+  geom_text(data = filter(OR_total_df, sub_ctg == "8"),
+            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "8"), 
+             size = 6, color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
-  scale_x_continuous(breaks = seq(0,7,1)) +
-  scale_y_discrete(limits = c("Rain", "Snow", "Season", "Hour of the day")) +
+  scale_x_continuous(breaks = c(1, 1.5)) +
+  labs(title = "Logistic Regression",
+       x = "Odds Ratio",
+       y = " ") +
   theme_bw() +
-  theme(panel.grid.minor = element_blank())
+  theme(panel.grid.minor = element_blank(),
+        plot.title = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 14),
+        legend.position = "None") 
 
-OR_hour_of_day =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "hour_of_day")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " ",
-    subtitle = "Hour of the day",
-    caption = "reference to night"
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
-OR_prcp = 
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "prcp_ctg")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw() 
-
-
-OR_snow =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "snow_ctg")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
-
-
-OR_season =
-fit_logistic %>% 
-  broom::tidy() %>% 
-  filter(str_detect(term, "season")) %>% 
-  mutate(OR = exp(estimate),
-         lower_CI_OR = exp(estimate - 1.96*std.error),
-         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
-  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR), 
-                color = "darkred") +
-  labs(
-    x = " ",
-    y = " "
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
+ggsave("OR.png", plot = OR, width = 45, height = 20, units = "cm")
 ```
