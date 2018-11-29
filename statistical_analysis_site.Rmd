@@ -1,5 +1,9 @@
 ---
-title: "Statistical Analysis"
+title: "Regression"
 output: html_document
 ---
+
+## Logistic Regression
+
+<img src="./OR.png" style="width:90%" >
 
