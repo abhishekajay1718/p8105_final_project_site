@@ -13,7 +13,7 @@
 
 <meta name="date" content="2018-11-28" />
 
-<title>EDA</title>
+<title>Exploratory Data Analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -294,10 +294,10 @@ div.tocify {
   <a href="flexdashboard.html">Data Dashboard</a>
 </li>
 <li>
-  <a href="EDA.html">EDA</a>
+  <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis.html">Statistical Analysis</a>
+  <a href="statistical_analysis_site.html">Statistical Analysis</a>
 </li>
 <li>
   <a href="about.html">About</a>
@@ -323,14 +323,108 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EDA</h1>
+<h1 class="title toc-ignore">Exploratory Data Analysis</h1>
 <h4 class="author"><em>Youn Kyeong Chang (uni# yc3242)</em></h4>
 <h4 class="date"><em>November 28, 2018</em></h4>
 
 </div>
 
 
-<pre class="r"><code>load(&#39;data/finaldat.RData&#39;)</code></pre>
+<pre class="r"><code>prcp_eda =
+finaldat %&gt;% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c(&quot;no_prcp&quot;, &quot;low&quot;, &quot;high&quot;))) %&gt;% 
+  group_by(date, prcp_ctg) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    title = &quot;Rainy conditions&quot;,
+    y = &quot;Mean response time(min)&quot;,
+    x = &quot; &quot;
+  ) +
+  scale_x_discrete(labels = c(&quot;0(mm)&quot;, &quot;0-25(mm)&quot;, &quot;25(mm)+&quot;)) +
+  viridis::scale_fill_viridis(
+    name = &quot;Precipitation&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 9),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 6),
+        legend.position = &quot;None&quot;) 
+
+snow_eda =
+  finaldat %&gt;% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c(&quot;no_snow&quot;, &quot;low&quot;, &quot;high&quot;))) %&gt;% 
+  group_by(date, snow_ctg) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    title = &quot;Snowy conditions&quot;,
+    y = &quot;&quot;,
+    x = &quot; &quot;
+  ) +
+  scale_x_discrete(labels = c(&quot;0(mm)&quot;, &quot;0-50(mm)&quot;, &quot;50(mm)+&quot;)) +
+  viridis::scale_fill_viridis(
+    name = &quot;Snow&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 9),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 6),
+        legend.position = &quot;None&quot;) 
+
+prcp_snow = prcp_eda + snow_eda
+
+ggsave(&quot;prcp_snow.png&quot;, plot = prcp_snow)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+<pre class="r"><code>season_eda =
+finaldat %&gt;% 
+  mutate(season = fct_relevel(season, c(&quot;Spring&quot;, &quot;Summer&quot;, &quot;Fall&quot;, &quot;Winter&quot;))) %&gt;% 
+  group_by(date, season) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = season, y = mean_resp_time)) +
+  geom_violin(aes(fill = season), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    title = &quot;Season&quot;,
+    y = &quot;Mean response time (min)&quot;,
+    x = &quot; &quot;
+  ) +
+  viridis::scale_fill_viridis(
+    name = &quot;season&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 11),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 8),
+        legend.position = &quot;None&quot;) 
+
+ggsave(&quot;season.png&quot;, plot = season_eda)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+<pre class="r"><code>hour_eda =
+finaldat %&gt;%
+  group_by(hour) %&gt;% 
+  ggplot(aes(x = hour, y = response_time)) + 
+  geom_smooth(se = FALSE, color = &quot;darkred&quot;) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c(&quot;6am&quot;, &quot;12pm&quot;, &quot;18pm&quot;)) +
+  geom_vline(xintercept = c(6, 12, 18), color = &quot;darkblue&quot;) +
+  labs(
+    x = &quot; &quot;, 
+    y = &quot;Mean response time (min)&quot;,
+    title = &quot;Over a day&quot;) +
+  theme(plot.title = element_text(size = 11),
+        axis.title.y = element_text(size = 7),
+        axis.text.x = element_text(size = 8),
+        legend.position = &quot;None&quot;) 
+
+ggsave(&quot;hour.png&quot;, plot = hour_eda)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
 
 
 
