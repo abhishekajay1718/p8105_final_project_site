@@ -2,8 +2,16 @@
 title: "Logistic Regression"
 output: html_document
 ---
+### Model
 
-## Logistic Regression
+$$
+\begin{aligned}
+&logit(P(response\space time > 8 min))\\
+&= \beta_{0} + \beta_{1}I(season = Fall) + \beta_{2}I(season = Summer) + \beta_{3}I(season = Winter) \\
+& + \beta_{4}I(hour_of_day = afternoon) + \beta_{5}I(hour_of_day = dawn) + \beta_{6}I(hour_of_day = morning) + \beta_{7}I(snow = 50mm+) \\
+& + \beta_{8}I(snow = 50mm-) + \beta_{9}I(prcp = 25mm+) + \beta_{10}I(prcp = 25mm-) 
+\end{aligned}
+$$
 
 <img src="./OR.png" style="width:90%" >
 

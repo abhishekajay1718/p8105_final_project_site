@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(kableExtra)
+library(magick)
+
 knitr::opts_chunk$set(echo = TRUE)
 
 theme_set(theme_bw())
@@ -51,25 +54,14 @@ fit_logistic =
 
 summary(fit_logistic)
 
-
-OR_total = 
 fit_logistic %>% 
   broom::tidy() %>% 
   mutate(OR = exp(estimate),
          lower_CI_OR = exp(estimate - 1.96*std.error),
          upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
   select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
-  mutate(term = fct_reorder(term, OR)) %>% 
-  ggplot(aes(x = term, y = OR)) + 
-  geom_point() + 
-  geom_errorbar(aes(ymin = lower_CI_OR, ymax = upper_CI_OR)) +
-  labs(
-    x = " ",
-    y = "Odds Ratio"
-  ) +
-  coord_flip() +
-  geom_hline(yintercept = 1.0, color = "blue") +
-  theme_bw()
+  mutate(term = c("intercept", "Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-")) %>%   knitr::kable(digits = 3, "html") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+
 
 OR_total_df = 
 fit_logistic %>% 
@@ -105,7 +97,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "1"),
-            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
             nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
              size = 6, color = "seagreen4",
@@ -115,7 +107,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "2"),
-            aes(label = sub_ctg_chr), colour = "indianred4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
             nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "2"), 
              size = 6, color = "indianred4") +
@@ -124,7 +116,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "3"),
-            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
             nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
   geom_point(data = filter(OR_total_df, sub_ctg == "3"), 
              size = 6, color = "lavenderblush4",
@@ -134,8 +126,8 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = +.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "4"),
-            aes(label = sub_ctg_chr), colour = "skyblue2", 
-            nudge_x = -.22, nudge_y = +.1, check_overlap = TRUE) +
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue2", 
+            nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
              size = 6, color = "skyblue2",
              position = position_nudge(y = +.1)) +
@@ -144,8 +136,8 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = -.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "5"),
-            aes(label = sub_ctg_chr), colour = "skyblue4", 
-            nudge_x = -.25, nudge_y = -.1, check_overlap = TRUE) +
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue4", 
+            nudge_x = -.16, nudge_y = -.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
              size = 6, color = "skyblue4", 
              position = position_nudge(y = -.1)) +
@@ -155,7 +147,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "6"),
-            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
             nudge_x = -.14, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
              size = 6, color = "seagreen4",
@@ -165,7 +157,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "7"),
-            aes(label = sub_ctg_chr), colour = "indianred4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
             nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
              size = 6, color = "indianred4") +
@@ -174,22 +166,21 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  size = .5, height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "8"),
-            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
             nudge_x = -.13, nudge_y = -.2, check_overlap = TRUE) +  
   geom_point(data = filter(OR_total_df, sub_ctg == "8"), 
              size = 6, color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
-  scale_x_continuous(breaks = c(1, 1.5)) +
-  labs(title = "Logistic Regression",
-       x = "Odds Ratio",
+  scale_x_continuous(breaks = c(1, 1.5),
+                     limits = c(.7, 1.7)) +
+  labs(x = "Odds Ratio",
        y = " ") +
   theme_bw() +
   theme(panel.grid.minor = element_blank(),
-        plot.title = element_text(size = 14),
-        axis.title.x = element_text(size = 14),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 14),
+        axis.title.x = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 20),
         legend.position = "None") 
 
-ggsave("OR.png", plot = OR, width = 45, height = 20, units = "cm")
+ggsave("OR.png", plot = OR, width = 45, height = 25, units = "cm")
 ```
