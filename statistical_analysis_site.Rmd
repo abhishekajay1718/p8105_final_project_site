@@ -1,5 +1,5 @@
 ---
-title: "Regression"
+title: "Logistic Regression"
 output: html_document
 ---
 

@@ -297,7 +297,7 @@ div.tocify {
   <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Statistical Analysis</a>
+  <a href="statistical_analysis_site.html">Analysis</a>
 </li>
 <li>
   <a href="about.html">About</a>
@@ -347,9 +347,9 @@ finaldat %&gt;%
   viridis::scale_fill_viridis(
     name = &quot;Precipitation&quot;,
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 9),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 6),
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
         legend.position = &quot;None&quot;) 
 
 snow_eda =
@@ -369,9 +369,9 @@ snow_eda =
   viridis::scale_fill_viridis(
     name = &quot;Snow&quot;,
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 9),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 6),
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
         legend.position = &quot;None&quot;) 
 
 prcp_snow = prcp_eda + snow_eda
@@ -396,9 +396,9 @@ finaldat %&gt;%
   viridis::scale_fill_viridis(
     name = &quot;season&quot;,
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 11),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 8),
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
         legend.position = &quot;None&quot;) 
 
 ggsave(&quot;season.png&quot;, plot = season_eda)</code></pre>
@@ -406,22 +406,68 @@ ggsave(&quot;season.png&quot;, plot = season_eda)</code></pre>
 <pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
 <pre class="r"><code>hour_eda =
 finaldat %&gt;%
-  group_by(hour) %&gt;% 
-  ggplot(aes(x = hour, y = response_time)) + 
-  geom_smooth(se = FALSE, color = &quot;darkred&quot;) +
+  group_by(hour, season) %&gt;% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = c(6, 12, 18),
                      labels = c(&quot;6am&quot;, &quot;12pm&quot;, &quot;18pm&quot;)) +
-  geom_vline(xintercept = c(6, 12, 18), color = &quot;darkblue&quot;) +
+  geom_vline(xintercept = c(6, 12, 18), color = &quot;darkred&quot;) +
   labs(
     x = &quot; &quot;, 
     y = &quot;Mean response time (min)&quot;,
     title = &quot;Over a day&quot;) +
-  theme(plot.title = element_text(size = 11),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 8),
-        legend.position = &quot;None&quot;) 
-
-ggsave(&quot;hour.png&quot;, plot = hour_eda)</code></pre>
+   viridis::scale_color_viridis(
+    name = &quot;Season&quot;,
+    discrete = TRUE)
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = &quot;None&quot;) </code></pre>
+<pre><code>## List of 4
+##  $ axis.title.y   :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 10
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ axis.text.x    :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 12
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ legend.position: chr &quot;None&quot;
+##  $ plot.title     :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 13
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
+##  - attr(*, &quot;complete&quot;)= logi FALSE
+##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+<pre class="r"><code>ggsave(&quot;hour.png&quot;, plot = hour_eda)</code></pre>
 <pre><code>## Saving 7 x 5 in image</code></pre>
 <pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
 <pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
