@@ -55,9 +55,9 @@ finaldat %>%
   viridis::scale_fill_viridis(
     name = "Precipitation",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 9),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 6),
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
         legend.position = "None") 
 
 snow_eda =
@@ -77,9 +77,9 @@ snow_eda =
   viridis::scale_fill_viridis(
     name = "Snow",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 9),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 6),
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
         legend.position = "None") 
 
 prcp_snow = prcp_eda + snow_eda
@@ -105,9 +105,9 @@ finaldat %>%
   viridis::scale_fill_viridis(
     name = "season",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 11),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 8),
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
         legend.position = "None") 
 
 ggsave("season.png", plot = season_eda)
@@ -127,9 +127,9 @@ finaldat %>%
     x = " ", 
     y = "Mean response time (min)",
     title = "Over a day") +
-  theme(plot.title = element_text(size = 11),
-        axis.title.y = element_text(size = 7),
-        axis.text.x = element_text(size = 8),
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
         legend.position = "None") 
 
 ggsave("hour.png", plot = hour_eda)

@@ -2,3 +2,17 @@
 title: "Exploratory Data Analysis"
 output: html_document
 ---
+
+In order to figure out the association between response time and each explanatory variables, exploratory data analysis was performed.
+
+<img src="./prcp_snow.png" style="width:75%" >
+
+Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time but snow is.
+
+<img src="./season.png" style="width:50%" >
+
+Mean response time is slightly increased in winter, which may be explained along with snow variable.  
+
+<img src="./hour.png" style="width:50%" >
+
+It seems that response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.   
