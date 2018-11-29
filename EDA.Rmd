@@ -117,19 +117,22 @@ ggsave("season.png", plot = season_eda)
 ```{r}
 hour_eda =
 finaldat %>%
-  group_by(hour) %>% 
-  ggplot(aes(x = hour, y = response_time)) + 
-  geom_smooth(se = FALSE, color = "darkred") +
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = c(6, 12, 18),
                      labels = c("6am", "12pm", "18pm")) +
-  geom_vline(xintercept = c(6, 12, 18), color = "darkblue") +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
   labs(
     x = " ", 
     y = "Mean response time (min)",
     title = "Over a day") +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE)
   theme(plot.title = element_text(size = 13),
         axis.title.y = element_text(size = 10),
-        axis.text.x = element_text(size = 9),
+        axis.text.x = element_text(size = 12),
         legend.position = "None") 
 
 ggsave("hour.png", plot = hour_eda)
