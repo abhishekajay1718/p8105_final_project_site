@@ -11,7 +11,7 @@
 
 
 
-<title>Tentative_report</title>
+<title>tentative report</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,9 +19,6 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -173,101 +170,6 @@ $(document).ready(function () {
 
 
 
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
-
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
-
-
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -286,19 +188,19 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="tentative_report.html">Report</a>
-</li>
-<li>
-  <a href="flexdashboard.html">Data Dashboard</a>
+  <a href="Introduction.html">Introduction</a>
 </li>
 <li>
   <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Analysis</a>
+  <a href="statistical_analysis_site.html">Result</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -321,45 +223,39 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Tentative_report</h1>
+<h1 class="title toc-ignore">tentative report</h1>
 
 </div>
 
 
-<div id="motivation" class="section level3">
-<h3>Motivation:</h3>
-<p>A major concern in emergency medical services (EMS) planning has been the need to minimize response time to better patient outcome, translated by some EMS operations into a goal of a response time of 8 minutes or less for advanced life support (ALS) units responding to life-threatening events. An exploratory analysis suggested there may be a small beneficial effect of response ≤7 minutes 59 seconds for those who survived to become an inpatient. More information on this can be found <a href="https://www.ncbi.nlm.nih.gov/pubmed/11927452">here</a> and <a href="https://www.ncbi.nlm.nih.gov/pubmed/22026820">here</a></p>
-<p>Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. Hence, we decided to analyse the EMS response time in New York City in the year 2017 with respect to weather and street blockage so as to improve it.</p>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<div id="data-source" class="section level2">
+<h2>Data Source</h2>
+<p><a href = "https://europepmc.org/articles/pmc32251"> Effect of reducing ambulance response times on deaths from out of hospital cardiac arrest: cohort study</a></p>
+<p><a href = "https://www.ncbi.nlm.nih.gov/pubmed/22026820">Emergency medical services response time and mortality in an urban setting.</a></p>
+<p><a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a></p>
 </div>
-<div id="about-the-data" class="section level3">
-<h3>About the data:</h3>
-<p><strong>Incidents Responded to by Fire Companies:</strong> [<a href="https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd" class="uri">https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd</a>] This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is <strong>response time</strong> which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.</p>
-<p><strong>The New York City Weather Data</strong> [<a href="https://www.ncdc.noaa.gov/cdo-web/datasets" class="uri">https://www.ncdc.noaa.gov/cdo-web/datasets</a>]</p>
-<p>This dataset includes weather records of the city from 2014- 2018. We have restrcited our analysis to 2017 so the data was filtered accordingly. From this dataset, we have selected <em>precipication</em>, <em>snow</em>, <em>snow depth</em> and <em>maximum and minimum temperatures</em> everyday throughout the year.</p>
-<p><strong>Street Closure due to Construction data</strong> : [<a href="https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk" class="uri">https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk</a>] For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.</p>
-<p>Additionally, since our data contained only zip code, we matched the neighbourhood table given <a href="https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20">here</a> with the zip codes.</p>
-<p>Since these datasets were obtained from different sources, incident data and weather data were merged together by the “date” variable. Further, incident data was seperated into day,month and year variables which helped us categorise different seasons by month, time of day(morning, evening etc.). A seperate variable was name categorizing response time above or below 8 mins since it is generally accepted within the field that an ‘ideal’ response time for emergency calls would be within eight minutes, ninety-percent of the time. Precipitation from weather data was also categorized into high, medium and low to conduct our analysis on.</p>
+<div id="statistical-analyses" class="section level2">
+<h2>Statistical Analyses</h2>
+<p>We assess the average response time of emergency medical service by calculating the time difference between call and arrival across all neighborhoods in NYC. Upon looking at the profile of the response time all through the year, we carry out a log-transformation of the response time (// comment on use of box cox?)</p>
+<p>Multiple linear regression models have been fit on to predictors such as time of day, day of week and weather to see the variation in log of response times.</p>
+<p>We carry out another hypothesis testing of the difference in the average response time within Upper West Side and Washington Heights.</p>
+<p>Null Hypothesis: There is not difference between the response times in the two neighborhoods</p>
+<p>Alternate Hypothesis: There is.</p>
 </div>
-<div id="questions-that-drove-our-analysis" class="section level3">
-<h3>Questions that drove our analysis:</h3>
-<ul>
-<li><p>How is the response time affected by the weather specifically when it is snowing or raining or by seasons?</p></li>
-<li><p>How often does the EMS arrive within ideal time(8mins)?</p></li>
-<li><p>How is different during different times of the day?</p></li>
-<li><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/29381111">This</a> study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. So we thought what is the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths.</p></li>
-</ul>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<p>kfneoinf</p>
 </div>
-<div id="limitations-of-our-analysis" class="section level3">
-<h3>Limitations of our analysis:</h3>
-<ul>
-<li>response time ‘clock’ almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.</li>
-</ul>
+</div>
+<div id="conclusions" class="section level1">
+<h1>Conclusions</h1>
+<p>lkmfkfm</p>
 </div>
 
 
 
-</div>
-</div>
 
 </div>
 

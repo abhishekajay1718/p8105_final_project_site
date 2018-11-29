@@ -188,19 +188,19 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="tentative_report.html">Report</a>
-</li>
-<li>
-  <a href="flexdashboard.html">Data Dashboard</a>
+  <a href="Introduction.html">Introduction</a>
 </li>
 <li>
   <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Analysis</a>
+  <a href="statistical_analysis_site.html">Result</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -228,8 +228,8 @@ $(document).ready(function () {
 </div>
 
 
-<div id="logistic-regression-model" class="section level3">
-<h3>Logistic Regression Model</h3>
+<div id="model" class="section level3">
+<h3>Model</h3>
 <p><span class="math display">\[
 \begin{aligned}
 &amp;logit(P(response\space time &gt; 8 min))\\
@@ -242,6 +242,10 @@ $(document).ready(function () {
 <div id="result" class="section level3">
 <h3>Result</h3>
 <p><img src="OR.png" style="width:90%" > <img src="OR_result.png" style="width:90%" ></p>
+<p><strong>Snow</strong> As expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm snow and 47% by over 50mm snow.</p>
+<p><strong>Season</strong> Compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%.</p>
+<p><strong>Rain</strong> Statistically significant result was not obtained from rain variable and it matches the result of EDA.</p>
+<p><strong>Hour of the day</strong> In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.</p>
 </div>
 
 
