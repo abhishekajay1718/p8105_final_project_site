@@ -2,7 +2,7 @@
 title: "Logistic Regression"
 output: html_document
 ---
-### Logistic Regression Model
+### Model
 
 $$
 \begin{aligned}
@@ -16,4 +16,16 @@ $$
 ### Result
 <img src="./OR.png" style="width:90%" >
 <img src="./OR_result.png" style="width:90%" >
+
+**Snow**
+  As expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm snow and 47% by over 50mm snow.
+
+**Season** 
+  Compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%. 
+
+**Rain**
+  Statistically significant result was not obtained from rain variable and it matches the result of EDA.
+
+**Hour of the day**
+  In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 

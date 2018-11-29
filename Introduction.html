@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Introduction</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="Introduction.html">Introduction</a>
+</li>
+<li>
+  <a href="EDA_site.html">EDA</a>
+</li>
+<li>
+  <a href="statistical_analysis_site.html">Result</a>
+</li>
+<li>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
+</li>
+<li>
+  <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/dewyork/P8105_final_project">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction</h1>
+
+</div>
+
+
+<div id="background-and-objective" class="section level1">
+<h1>Background and Objective</h1>
+<p>Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System.</p>
+<p><a href = "https://europepmc.org/articles/pmc32251"> Effect of reducing ambulance response times on deaths from out of hospital cardiac arrest: cohort study</a></p>
+<p>Currently, the ambulance service has a statutory obligation to arrive at the scene of 50% of emergency calls within 7 minutes and 90% within 14 minutes. The government is considering reducing this target to 90% within 8 minutes.3 Another way to reduce delays would be for other first responders, such as firefighters, the police, or community volunteers, to be supplied with “intelligent” defibrillators within a medically controlled system.4 The fire service, for example, has more stations than the ambulance service to allow it to meet its more stringent targets—90% of vehicles are required to attend the scene of a fire within 5 minutes of the emergency call.</p>
+<p><a href = "https://www.ncbi.nlm.nih.gov/pubmed/22026820">Emergency medical services response time and mortality in an urban setting.</a></p>
+<p>Modern emergency medical services (EMS) is the first level of health care response for out-of-hospital medical emergencies. Historically, one of the first interventions that prehospital personnel performed was rapid response to a scene and rapid return of a patient to hospital by use of lights and siren.</p>
+<p><a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a></p>
+<p>This study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. This got us interested in exploring the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths.</p>
+<div id="motivation" class="section level3">
+<h3>Motivation:</h3>
+<p>A major concern in emergency medical services (EMS) planning has been the need to minimize response time to better patient outcome, translated by some EMS operations into a goal of a response time of 8 minutes or less for advanced life support (ALS) units responding to life-threatening events. An exploratory analysis suggested there may be a small beneficial effect of response ≤7 minutes 59 seconds for those who survived to become an inpatient. More information on this can be found <a href="https://www.ncbi.nlm.nih.gov/pubmed/11927452">here</a> and <a href="https://www.ncbi.nlm.nih.gov/pubmed/22026820">here</a></p>
+<p>Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. Hence, we decided to analyse the EMS response time in New York City in the year 2017 with respect to weather and street blockage so as to improve it.</p>
+</div>
+<div id="about-the-data" class="section level3">
+<h3>About the data:</h3>
+<p><strong>Incidents Responded to by Fire Companies:</strong> [<a href="https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd" class="uri">https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd</a>] This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is <strong>response time</strong> which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.</p>
+<p><strong>The New York City Weather Data</strong> [<a href="https://www.ncdc.noaa.gov/cdo-web/datasets" class="uri">https://www.ncdc.noaa.gov/cdo-web/datasets</a>]</p>
+<p>This dataset includes weather records of the city from 2014- 2018. We have restrcited our analysis to 2017 so the data was filtered accordingly. From this dataset, we have selected <em>precipication</em>, <em>snow</em>, <em>snow depth</em> and <em>maximum and minimum temperatures</em> everyday throughout the year.</p>
+<p><strong>Street Closure due to Construction data</strong> : [<a href="https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk" class="uri">https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk</a>] For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.</p>
+<p>Additionally, since our data contained only zip code, we matched the neighbourhood table given <a href="https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20">here</a> with the zip codes.</p>
+<p>Since these datasets were obtained from different sources, incident data and weather data were merged together by the “date” variable. Further, incident data was seperated into day,month and year variables which helped us categorise different seasons by month, time of day(morning, evening etc.). A seperate variable was name categorizing response time above or below 8 mins since it is generally accepted within the field that an ‘ideal’ response time for emergency calls would be within eight minutes, ninety-percent of the time. Precipitation from weather data was also categorized into high, medium and low to conduct our analysis on.</p>
+</div>
+<div id="questions-that-drove-our-analysis" class="section level3">
+<h3>Questions that drove our analysis:</h3>
+<ul>
+<li><p>How is the response time affected by the weather specifically when it is snowing or raining or by seasons?</p></li>
+<li><p>How often does the EMS arrive within ideal time(8mins)?</p></li>
+<li><p>How is different during different times of the day?</p></li>
+<li><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/29381111">This</a> study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. So we thought what is the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths.</p></li>
+</ul>
+</div>
+<div id="limitations-of-our-analysis" class="section level3">
+<h3>Limitations of our analysis:</h3>
+<ul>
+<li>response time ‘clock’ almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.</li>
+</ul>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

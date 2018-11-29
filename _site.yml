@@ -3,16 +3,16 @@ output_dir: "."
 navbar:
   title: "Home"
   right:
-    - text: "Report"
-      href: tentative_report.html
-    - text: "Data Dashboard"
-      href: flexdashboard.html
+    - text: "Introduction"
+      href: Introduction.html
     - text: "EDA"
       href: EDA_site.html
-    - text: "Analysis"
+    - text: "Result"
       href: statistical_analysis_site.html
-    - text: "About"
-      href: about.html
+    - text: "Conclusion"
+      href: conclusion_site.html
+    - text: "Data Dashboard"
+      href: flexdashboard.html
     - icon: fa-envelope fa-lg
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg

@@ -190,19 +190,19 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="tentative_report.html">Report</a>
-</li>
-<li>
-  <a href="flexdashboard.html">Data Dashboard</a>
+  <a href="Introduction.html">Introduction</a>
 </li>
 <li>
   <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Analysis</a>
+  <a href="statistical_analysis_site.html">Result</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -291,7 +291,6 @@ finaldat %&gt;%
   geom_violin(aes(fill = season), alpha = .3) +
   stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
   labs(
-    title = &quot;Season&quot;,
     y = &quot;Mean response time (min)&quot;,
     x = &quot; &quot;
   ) +
@@ -316,8 +315,8 @@ finaldat %&gt;%
   geom_vline(xintercept = c(6, 12, 18), color = &quot;darkred&quot;) +
   labs(
     x = &quot; &quot;, 
-    y = &quot;Mean response time (min)&quot;,
-    title = &quot;Over a day&quot;) +
+    y = &quot;Mean response time (min)&quot;
+    ) +
    viridis::scale_color_viridis(
     name = &quot;Season&quot;,
     discrete = TRUE)

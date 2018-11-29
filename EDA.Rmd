@@ -98,7 +98,6 @@ finaldat %>%
   geom_violin(aes(fill = season), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
-    title = "Season",
     y = "Mean response time (min)",
     x = " "
   ) +
@@ -125,8 +124,8 @@ finaldat %>%
   geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
   labs(
     x = " ", 
-    y = "Mean response time (min)",
-    title = "Over a day") +
+    y = "Mean response time (min)"
+    ) +
    viridis::scale_color_viridis(
     name = "Season",
     discrete = TRUE)

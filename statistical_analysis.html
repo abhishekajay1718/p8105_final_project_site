@@ -191,19 +191,19 @@ $(document).ready(function () {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="tentative_report.html">Report</a>
-</li>
-<li>
-  <a href="flexdashboard.html">Data Dashboard</a>
+  <a href="Introduction.html">Introduction</a>
 </li>
 <li>
   <a href="EDA_site.html">EDA</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Analysis</a>
+  <a href="statistical_analysis_site.html">Result</a>
 </li>
 <li>
-  <a href="about.html">About</a>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -534,7 +534,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  color = &quot;gray50&quot;, position = position_nudge(y = -.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == &quot;5&quot;),
             aes(label = sub_ctg_chr), size = 6, colour = &quot;skyblue4&quot;, 
-            nudge_x = -.16, nudge_y = -.1, check_overlap = TRUE) +
+            nudge_x = -.16, nudge_y = -.1) +
   geom_point(data = filter(OR_total_df, sub_ctg == &quot;5&quot;), 
              size = 6, color = &quot;skyblue4&quot;, 
              position = position_nudge(y = -.1)) +
@@ -569,7 +569,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
              size = 6, color = &quot;lavenderblush4&quot;,
              position = position_nudge(y = -adj)) +
   scale_x_continuous(breaks = c(1, 1.5),
-                     limits = c(.7, 1.7)) +
+                     limits = c(.7, 1.8)) +
   labs(x = &quot;Odds Ratio&quot;,
        y = &quot; &quot;) +
   theme_bw() +
@@ -580,7 +580,6 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
         legend.position = &quot;None&quot;) 
 
 ggsave(&quot;OR.png&quot;, plot = OR, width = 45, height = 25, units = &quot;cm&quot;)</code></pre>
-<pre><code>## Warning: Removed 1 rows containing missing values (geom_errorbarh).</code></pre>
 </div>
 
 
