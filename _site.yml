@@ -19,7 +19,5 @@ navbar:
       href: https://github.com/dewyork/P8105_final_project
 output:
   html_document:
-    toc: true
-    toc_float: true
     theme: journal
     css: style.css
