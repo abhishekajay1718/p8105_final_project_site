@@ -137,7 +137,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
                  color = "gray50", position = position_nudge(y = -.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "5"),
             aes(label = sub_ctg_chr), size = 6, colour = "skyblue4", 
-            nudge_x = -.16, nudge_y = -.1, check_overlap = TRUE) +
+            nudge_x = -.16, nudge_y = -.1) +
   geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
              size = 6, color = "skyblue4", 
              position = position_nudge(y = -.1)) +
@@ -172,7 +172,7 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
              size = 6, color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
   scale_x_continuous(breaks = c(1, 1.5),
-                     limits = c(.7, 1.7)) +
+                     limits = c(.7, 1.8)) +
   labs(x = "Odds Ratio",
        y = " ") +
   theme_bw() +
