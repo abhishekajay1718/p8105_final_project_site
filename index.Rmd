@@ -5,7 +5,9 @@ output: html_document
 Youn Kyeong Chang (yc3242), Pengxuan Chen(pc2853), Anusorn Thanataveerat (at2710), Apoorva Srinivasan (as5697), Abhishek Ajay (aa4266)
 
 
-<img src="./EMS.png" style="width:90%" class = "center"></center>
+<img src="./EMS.jpg" style="width:90%" class = "center"></center>
+
+image from: https://www.nytimes.com/2017/12/31/nyregion/fire-department-medical-emergencies-times-square-nyc.html
 
 
 
