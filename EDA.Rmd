@@ -47,15 +47,17 @@ finaldat %>%
   geom_violin(aes(fill = prcp_ctg), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
-    title = "Mean response time in rainy conditions",
-    y = "Mean response time (min)",
+    title = "Rainy conditions",
+    y = "Mean response time(min)",
     x = " "
   ) +
-  scale_x_discrete(labels = c("No precipitation", "Low precipitation", "High precipitation")) +
+  scale_x_discrete(labels = c("0(mm)", "0-25(mm)", "25(mm)+")) +
   viridis::scale_fill_viridis(
     name = "Precipitation",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 12),
+  theme(plot.title = element_text(size = 9),
+        axis.title.y = element_text(size = 7),
+        axis.title.x = element_text(size = 5),
         strip.background = element_rect(fill = "black"),
         strip.text = element_text(color = "white", face = "bold"),
         legend.position = "None") 
@@ -69,20 +71,24 @@ snow_eda =
   geom_violin(aes(fill = snow_ctg), alpha = .3) +
   stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
   labs(
-    title = "Mean response time in snowy conditions",
+    title = "Snowy conditions",
     y = "",
     x = " "
   ) +
-  scale_x_discrete(labels = c("No snow", "Low snow", "High snow")) +
+  scale_x_discrete(labels = c("0(mm)", "0-50(mm)", "50(mm)+")) +
   viridis::scale_fill_viridis(
     name = "Snow",
     discrete = TRUE) +
-  theme(plot.title = element_text(size = 12),
+  theme(plot.title = element_text(size = 9),
+        axis.title.y = element_text(size = 7),
+        axis.title.x = element_text(size = 5),
         strip.background = element_rect(fill = "black"),
         strip.text = element_text(color = "white", face = "bold"),
         legend.position = "None") 
 
-prcp_eda + snow_eda
+prcp_snow = prcp_eda + snow_eda
+
+ggsave("prcp_snow.png", plot = prcp_snow)
 ```
 
 
