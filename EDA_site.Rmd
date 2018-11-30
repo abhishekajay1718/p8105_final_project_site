@@ -8,7 +8,7 @@ In order to figure out the association between response time and each explanator
 ### Weather
 <img src="./prcp_snow.png" style="width:75%" class = "center"></center>
 
-Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time but snow is.
+Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time as much as snow is. 
 
 ### Season
 <img src="./season.png" style="width:75%" "height: auto" class = "center"></center>
