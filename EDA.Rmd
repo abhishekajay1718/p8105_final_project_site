@@ -6,11 +6,101 @@ output: html_document
 ---
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(patchwork)
+library(lubridate)
+library(xml2)
+library(rvest)
+library(rnoaa)
+
 knitr::opts_chunk$set(echo = TRUE)
 
 theme_set(theme_bw())
 ```
+
+## Data preparation
+## Incident data (response from Fire company)
+```{r }
+incident_dat_2017 <-  
+  read_csv('data/Incidents_Responded_to_by_Fire_Companies.csv',
+  col_types = "cicccicciccccccccccciccccccc") %>% 
+  janitor::clean_names() %>% 
+  #recode date/time
+  mutate(incident_date_time = mdy_hms(incident_date_time),
+         arrival_date_time = mdy_hms(arrival_date_time)) %>% 
+  #select year 2017
+  filter(year(incident_date_time) == 2017,
+         incident_type_desc == "300 - Rescue, EMS incident, other") %>% 
+  select(im_incident_key, incident_date_time, arrival_date_time,
+         street_highway:borough_desc) %>% 
+  na.omit() %>% 
+
+  # Added response time(minute) variable
+  # mutate(response_time = arrival_date_time - incident_date_time) %>%
+  mutate(response_time = difftime(arrival_date_time, incident_date_time, units = 'mins'),
+  # Added hour variable
+  hour = hour(incident_date_time),
+  date = date(incident_date_time),
+  # Added incident_month and incident_day variables from incident_date_time
+  incident_date = as.Date(incident_date_time)) %>% 
+  separate(incident_date, 
+           into = c("incident_year", "incident_month", "incident_day"), 
+           sep = "-") %>% 
+  select(-incident_year) %>% 
+  mutate(incident_month = as.numeric(incident_month),
+         incident_day = as.numeric(incident_day))
+
+save(incident_dat_2017, file = "data/incident_dat_2017.RData")
+```
+
+## Neighborhood variable (by zipcode) dataset
+```{r fig.height = 8}
+url = "https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20"
+
+xml = read_html(url)
+
+zip_code_table = (xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table() %>% 
+  janitor::clean_names() %>%  
+  select(neighborhood, zip_codes) %>% 
+  separate(zip_codes, c("a", "b", "c", "d", "e", "f", "g", "h", "i"), 
+           sep = ",") %>% 
+  gather(key = to_remove, value = zip_code, a:i) %>% 
+  select(-to_remove) %>% 
+  na.omit() %>% 
+  distinct() %>% 
+  mutate(zip_code = as.numeric(zip_code))
+
+save(zip_code_table, file = "data/zipcode.RData")
+```
+
+## Add weather-related dataset
+```{r}
+library(rnoaa)
+
+nyc_weather_2017 = 
+  rnoaa::meteo_pull_monitors("USW00094728", 
+                             var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
+                             date_min = "2017-01-01", 
+                             date_max = "2017-12-31"
+                             ) %>% 
+  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10) %>% 
+  select(-id)
+
+save(nyc_weather_2017, file = "data/nyc_weather_2017.RData")
+```
+
+## Merge first three for final dataset
+
+```{r merge}
+# incident_dat_2017 
+finaldat =  
+  left_join(incident_dat_2017, zip_code_table, by = "zip_code") %>% 
+  inner_join(., nyc_weather_2017, by = "date")
+
+save(finaldat, file = "data/finaldat.RData")
+```
+
+## Add additional variables and save finaldat in /data
 
 ```{r finaldata, include = FALSE}
 load('data/finaldat.RData')
@@ -32,11 +122,12 @@ finaldat =
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
-         over_8min = fct_relevel(over_8min, "8min-")) %>% 
-  select(-over_5min)
+         over_8min = fct_relevel(over_8min, "8min-")) 
 ```
 
+## EDA
 
+#### precipitation and snow
 ```{r}
 prcp_eda =
 finaldat %>% 
@@ -87,7 +178,7 @@ prcp_snow = prcp_eda + snow_eda
 ggsave("prcp_snow.png", plot = prcp_snow)
 ```
 
-
+#### Season
 ```{r}
 season_eda =
 finaldat %>% 
@@ -112,7 +203,7 @@ finaldat %>%
 ggsave("season.png", plot = season_eda)
 ```
 
-
+#### Hour
 ```{r}
 hour_eda =
 finaldat %>%
