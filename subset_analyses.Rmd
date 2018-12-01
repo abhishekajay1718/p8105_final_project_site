@@ -1,7 +1,7 @@
 ---
-title: "Statistical analysis"
-author: "Youn Kyeong Chang (uni# yc3242)"
-date: "November 28, 2018"
+title: "Subset analysis"
+author: ""
+date: "December 1, 2018"
 output: html_document
 ---
 
@@ -9,6 +9,7 @@ output: html_document
 library(tidyverse)
 library(kableExtra)
 library(magick)
+library(broom)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -16,43 +17,55 @@ theme_set(theme_bw())
 ```
 
 ```{r finaldata, include = FALSE}
-load('data/finaldat.RData')
+load('data/subset_dat.RData') 
 
-finaldat = 
-  finaldat %>%
-  mutate(season = 
-           ifelse(incident_month %in% 9:11, "Fall",
-           ifelse(incident_month %in% c(12,1,2), "Winter",
-           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
-         hour_of_day = 
-           ifelse(hour %in% 6:11, "morning",
-           ifelse(hour %in% 12:17, "afternoon",
-           ifelse(hour %in% 18:23, "night","dawn"))), 
-         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
-         prcp_ctg = 
-           if_else(prcp == 0, "no_prcp",
-           if_else((prcp > 0 & prcp <= 25), "low", "high")),
-         snow_ctg = 
-           if_else(snow == 0, "no_snow",
-           if_else((snow > 0 & snow <= 50), "low", "high")),
-         over_8min = fct_relevel(over_8min, "8min-")) %>% 
-  select(-over_5min)
-```
-
-## Logistic regression with binary outcome 8min- / 8min+
-```{r}
-finaldat = 
-  finaldat %>% 
+subset <- dat_subset %>% 
+  #Only retain variables of interest
+  select(response_time, neighborhood, season:street_closed) %>% 
+  #recode neightborhood (washington as opposed to Inwood + washington heights)
+  mutate(neighborhood = ifelse(neighborhood == 'Inwood and Washington Heights',
+      'Washington Heights', neighborhood)) %>% 
   mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
          snow_ctg = fct_relevel(snow_ctg, "no_snow"),
          season = fct_relevel(season, "Spring"),
          hour_of_day = fct_relevel(hour_of_day, "night"))
+```
 
-fit_logistic =
-  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
-      family = binomial(), data = finaldat)
+## Logistic regression with among UWS
+```{r}
+uws_dat <- subset %>% filter(neighborhood == 'Upper West Side')
+fit_logistic_uws =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = uws_dat)
 
-summary(fit_logistic)
+summary(fit_logistic_uws)
+```
+
+## Logistic regression with among Washington heights
+```{r}
+wash_dat <- subset %>% filter(neighborhood == 'Washington Heights')
+
+fit_logistic_wash =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = wash_dat)
+
+summary(fit_logistic_wash)
+```
+
+
+```{r}
+#Prepare table for visualization
+ fit_logistic_uws %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_uws))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term == 'victim_racenon-white')
+}
+```
+
+
+
 
 fit_logistic %>% 
   broom::tidy() %>% 
@@ -184,3 +197,18 @@ ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg,
 
 ggsave("OR.png", plot = OR, width = 45, height = 25, units = "cm")
 ```
+
+
+
+
+<!-- ## CombinedC -->
+```{r}
+# fit_logistic =
+#   glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, 
+#       family = binomial(), data = subset)
+# 
+# summary(fit_logistic)
+# neightborhood effect is not sig
+
+```
+
