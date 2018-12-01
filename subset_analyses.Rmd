@@ -62,7 +62,8 @@ table_results_uws <-  fit_logistic_uws %>%
   select(term, OR, conf.low, conf.high) %>% 
   filter(term != '(Intercept)') %>% 
   mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
-         neightborhood = 'UWS') 
+         neightborhood = 'UWS') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
 table_results_uws %>% 
   knitr::kable(digits = 3, "html") %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
@@ -73,11 +74,12 @@ table_results_uws %>%
 table_results_wash <-  fit_logistic_wash %>% 
   broom::tidy() %>% 
   mutate(OR = exp(estimate)) %>%
-  bind_cols(.,  exp(confint_tidy(fit_logistic_uws))) %>% 
+  bind_cols(.,  exp(confint_tidy(fit_logistic_wash))) %>% 
   select(term, OR, conf.low, conf.high) %>% 
   filter(term != '(Intercept)') %>% 
   mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
-         neightborhood = 'Washington Heights') 
+         neightborhood = 'Washington Heights') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
 table_results_wash %>% 
   knitr::kable(digits = 3, "html") %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
@@ -107,22 +109,26 @@ OR_all <-
 ggsave("OR_all.png", plot = OR_all, width = 45, height = 25, units = "cm")
 ```
 
+# Fitting regression model by neightborhood
+On UWS, high precipitation is associated with lower odds of response times greater than 8 minutes. What's interesting here is why? Street closure is associated with the outcome but not statistically significant.
+Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. 
+-It's either linking street closure to the zip code in this case is too broad or street closure did not really play a role in response time- 
 
 
-
-```
-
-
-
-
-<!-- ## CombinedC -->
 ```{r}
-# fit_logistic =
-#   glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, 
-#       family = binomial(), data = subset)
-# 
-# summary(fit_logistic)
-# neightborhood effect is not sig
+fit_logistic_neighbor =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, family = binomial(), data = subset)
+
+summary(fit_logistic_neighbor)
+
+fit_logistic_neighbor %>% 
+    broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_neighbor))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed", "Washington Heights"))
 
 ```
+Washington Height has 1.05 times the odds of response time greater than 8 minutes compared to UWS. However the observed effect is not statistically significant.
 

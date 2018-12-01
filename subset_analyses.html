@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Subset analysis</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/journal.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.0.13/css/fa-svg-with-js.css" rel="stylesheet" />
+<script src="site_libs/font-awesome-5.0.13/js/fontawesome-all.min.js"></script>
+<script src="site_libs/font-awesome-5.0.13/js/fa-v4-shims.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 61px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+
+.section h2 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h3 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h4 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h5 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+.section h6 {
+  padding-top: 66px;
+  margin-top: -66px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Home</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="Introduction.html">Introduction</a>
+</li>
+<li>
+  <a href="EDA_site.html">EDA</a>
+</li>
+<li>
+  <a href="statistical_analysis_site.html">Result</a>
+</li>
+<li>
+  <a href="conclusion_site.html">Conclusion</a>
+</li>
+<li>
+  <a href="flexdashboard.html">Data Dashboard</a>
+</li>
+<li>
+  <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/dewyork/P8105_final_project">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Subset analysis</h1>
+<h4 class="date"><em>December 1, 2018</em></h4>
+
+</div>
+
+
+<div id="logistic-regression-with-among-uws" class="section level2">
+<h2>Logistic regression with among UWS</h2>
+<pre class="r"><code>uws_dat &lt;- subset %&gt;% filter(neighborhood == &#39;Upper West Side&#39;)
+fit_logistic_uws =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = uws_dat)
+
+summary(fit_logistic_uws)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + 
+##     street_closed, family = binomial(), data = uws_dat)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5427  -0.3986  -0.3577  -0.3198   2.8739  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)          -2.83346    0.19867 -14.262   &lt;2e-16 ***
+## seasonFall           -0.47027    0.24973  -1.883   0.0597 .  
+## seasonSummer         -0.22236    0.20141  -1.104   0.2696    
+## seasonWinter         -0.01566    0.21217  -0.074   0.9412    
+## hour_of_dayafternoon  0.35631    0.18714   1.904   0.0569 .  
+## hour_of_daydawn       0.45071    0.25250   1.785   0.0743 .  
+## hour_of_daymorning    0.38077    0.20086   1.896   0.0580 .  
+## snow_ctghigh          0.44003    0.55488   0.793   0.4278    
+## snow_ctglow           0.28654    0.51052   0.561   0.5746    
+## prcp_ctghigh         -1.27998    0.72319  -1.770   0.0767 .  
+## prcp_ctglow          -0.01853    0.16096  -0.115   0.9084    
+## street_closed         0.20596    0.20845   0.988   0.3231    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1607  on 3386  degrees of freedom
+## Residual deviance: 1589  on 3375  degrees of freedom
+## AIC: 1613
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+<div id="logistic-regression-with-among-washington-heights" class="section level2">
+<h2>Logistic regression with among Washington heights</h2>
+<pre class="r"><code>wash_dat &lt;- subset %&gt;% filter(neighborhood == &#39;Washington Heights&#39;)
+
+fit_logistic_wash =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = wash_dat)
+
+summary(fit_logistic_wash)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + 
+##     street_closed, family = binomial(), data = wash_dat)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6915  -0.3962  -0.3538  -0.3066   2.6222  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)           -2.8675     0.2322 -12.351  &lt; 2e-16 ***
+## seasonFall            -0.2942     0.2297  -1.281  0.20016    
+## seasonSummer          -0.1007     0.2254  -0.447  0.65490    
+## seasonWinter           0.1149     0.2244   0.512  0.60866    
+## hour_of_dayafternoon   0.4628     0.2221   2.084  0.03716 *  
+## hour_of_daydawn        0.2508     0.2926   0.857  0.39135    
+## hour_of_daymorning     0.5856     0.2269   2.581  0.00986 ** 
+## snow_ctghigh           1.3078     0.6896   1.896  0.05791 .  
+## snow_ctglow           -0.1308     0.6369  -0.205  0.83726    
+## prcp_ctghigh          -0.8082     0.5062  -1.597  0.11035    
+## prcp_ctglow           -0.3349     0.1971  -1.699  0.08934 .  
+## street_closed         -0.1022     0.4760  -0.215  0.82994    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1277.1  on 2677  degrees of freedom
+## Residual deviance: 1258.6  on 2666  degrees of freedom
+## AIC: 1282.6
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>#Prepare table for visualization
+table_results_uws &lt;-  fit_logistic_uws %&gt;% 
+  broom::tidy() %&gt;% 
+  mutate(OR = exp(estimate)) %&gt;%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_uws))) %&gt;% 
+  select(term, OR, conf.low, conf.high) %&gt;% 
+  filter(term != &#39;(Intercept)&#39;) %&gt;% 
+  mutate(term = c(&quot;Fall&quot;, &quot;Summer&quot;, &quot;Winter&quot;, &quot;Afternoon&quot;, &quot;Dawn&quot;, &quot;Morning&quot;, &quot;snow 50+&quot;, &quot;snow 50-&quot;, &quot;prcp 25+&quot;, &quot;prcp 25-&quot;, &quot;Street closed&quot;),
+         neightborhood = &#39;UWS&#39;) %&gt;% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_uws %&gt;% 
+  knitr::kable(digits = 3, &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;))</code></pre>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+OR
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+<th style="text-align:left;">
+neightborhood
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fall
+</td>
+<td style="text-align:right;">
+0.625
+</td>
+<td style="text-align:right;">
+0.380
+</td>
+<td style="text-align:right;">
+1.013
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Summer
+</td>
+<td style="text-align:right;">
+0.801
+</td>
+<td style="text-align:right;">
+0.538
+</td>
+<td style="text-align:right;">
+1.187
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Winter
+</td>
+<td style="text-align:right;">
+0.984
+</td>
+<td style="text-align:right;">
+0.647
+</td>
+<td style="text-align:right;">
+1.489
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Afternoon
+</td>
+<td style="text-align:right;">
+1.428
+</td>
+<td style="text-align:right;">
+0.994
+</td>
+<td style="text-align:right;">
+2.074
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dawn
+</td>
+<td style="text-align:right;">
+1.569
+</td>
+<td style="text-align:right;">
+0.945
+</td>
+<td style="text-align:right;">
+2.553
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Morning
+</td>
+<td style="text-align:right;">
+1.463
+</td>
+<td style="text-align:right;">
+0.988
+</td>
+<td style="text-align:right;">
+2.177
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snow 50+
+</td>
+<td style="text-align:right;">
+1.553
+</td>
+<td style="text-align:right;">
+0.446
+</td>
+<td style="text-align:right;">
+4.154
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snow 50-
+</td>
+<td style="text-align:right;">
+1.332
+</td>
+<td style="text-align:right;">
+0.435
+</td>
+<td style="text-align:right;">
+3.348
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prcp 25+
+</td>
+<td style="text-align:right;">
+0.278
+</td>
+<td style="text-align:right;">
+0.045
+</td>
+<td style="text-align:right;">
+0.899
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prcp 25-
+</td>
+<td style="text-align:right;">
+0.982
+</td>
+<td style="text-align:right;">
+0.711
+</td>
+<td style="text-align:right;">
+1.338
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Street closed
+</td>
+<td style="text-align:right;">
+1.229
+</td>
+<td style="text-align:right;">
+0.818
+</td>
+<td style="text-align:right;">
+1.854
+</td>
+<td style="text-align:left;">
+UWS
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>table_results_wash &lt;-  fit_logistic_wash %&gt;% 
+  broom::tidy() %&gt;% 
+  mutate(OR = exp(estimate)) %&gt;%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_wash))) %&gt;% 
+  select(term, OR, conf.low, conf.high) %&gt;% 
+  filter(term != &#39;(Intercept)&#39;) %&gt;% 
+  mutate(term = c(&quot;Fall&quot;, &quot;Summer&quot;, &quot;Winter&quot;, &quot;Afternoon&quot;, &quot;Dawn&quot;, &quot;Morning&quot;, &quot;snow 50+&quot;, &quot;snow 50-&quot;, &quot;prcp 25+&quot;, &quot;prcp 25-&quot;, &quot;Street closed&quot;),
+         neightborhood = &#39;Washington Heights&#39;) %&gt;% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_wash %&gt;% 
+  knitr::kable(digits = 3, &quot;html&quot;) %&gt;% 
+  kableExtra::kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;))</code></pre>
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+OR
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+<th style="text-align:left;">
+neightborhood
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fall
+</td>
+<td style="text-align:right;">
+0.745
+</td>
+<td style="text-align:right;">
+0.473
+</td>
+<td style="text-align:right;">
+1.168
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Summer
+</td>
+<td style="text-align:right;">
+0.904
+</td>
+<td style="text-align:right;">
+0.580
+</td>
+<td style="text-align:right;">
+1.408
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Winter
+</td>
+<td style="text-align:right;">
+1.122
+</td>
+<td style="text-align:right;">
+0.721
+</td>
+<td style="text-align:right;">
+1.743
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Afternoon
+</td>
+<td style="text-align:right;">
+1.589
+</td>
+<td style="text-align:right;">
+1.035
+</td>
+<td style="text-align:right;">
+2.480
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dawn
+</td>
+<td style="text-align:right;">
+1.285
+</td>
+<td style="text-align:right;">
+0.713
+</td>
+<td style="text-align:right;">
+2.261
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Morning
+</td>
+<td style="text-align:right;">
+1.796
+</td>
+<td style="text-align:right;">
+1.158
+</td>
+<td style="text-align:right;">
+2.828
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snow 50+
+</td>
+<td style="text-align:right;">
+3.698
+</td>
+<td style="text-align:right;">
+0.790
+</td>
+<td style="text-align:right;">
+12.905
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+snow 50-
+</td>
+<td style="text-align:right;">
+0.877
+</td>
+<td style="text-align:right;">
+0.202
+</td>
+<td style="text-align:right;">
+2.666
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prcp 25+
+</td>
+<td style="text-align:right;">
+0.446
+</td>
+<td style="text-align:right;">
+0.144
+</td>
+<td style="text-align:right;">
+1.083
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prcp 25-
+</td>
+<td style="text-align:right;">
+0.715
+</td>
+<td style="text-align:right;">
+0.480
+</td>
+<td style="text-align:right;">
+1.041
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Street closed
+</td>
+<td style="text-align:right;">
+0.903
+</td>
+<td style="text-align:right;">
+0.311
+</td>
+<td style="text-align:right;">
+2.087
+</td>
+<td style="text-align:left;">
+Washington Heights
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>OR_UWS =
+ggplot(table_results_uws, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = &quot;dashed&quot;) +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
+
+OR_WASH =
+ggplot(table_results_wash, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = &quot;dashed&quot;) +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
+  
+OR_all &lt;- 
+  table_results_uws %&gt;% bind_rows(table_results_wash) %&gt;% 
+  ggplot(., aes(x = term, y = OR, colour = neightborhood)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = &quot;dashed&quot;) +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high), 
+     position = position_dodge(width = 0.30)) +
+     coord_flip() + xlab(&#39;&#39;) + ylab(&#39;Odds ratio&#39;) 
+ggsave(&quot;OR_all.png&quot;, plot = OR_all, width = 45, height = 25, units = &quot;cm&quot;)</code></pre>
+</div>
+<div id="fitting-regression-model-by-neightborhood" class="section level1">
+<h1>Fitting regression model by neightborhood</h1>
+<p>On UWS, high precipitation is associated with lower odds of response times greater than 8 minutes. What’s interesting here is why? Street closure is associated with the outcome but not statistically significant. Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. -It’s either linking street closure to the zip code in this case is too broad or street closure did not really play a role in response time-</p>
+<pre class="r"><code>fit_logistic_neighbor =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, family = binomial(), data = subset)
+
+summary(fit_logistic_neighbor)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + 
+##     street_closed + neighborhood, family = binomial(), data = subset)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6117  -0.3945  -0.3562  -0.3119   2.7517  
+## 
+## Coefficients:
+##                                Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)                    -2.86464    0.15912 -18.003  &lt; 2e-16 ***
+## seasonFall                     -0.37896    0.16624  -2.280  0.02263 *  
+## seasonSummer                   -0.18311    0.14944  -1.225  0.22048    
+## seasonWinter                    0.05325    0.15168   0.351  0.72553    
+## hour_of_dayafternoon            0.40097    0.14289   2.806  0.00501 ** 
+## hour_of_daydawn                 0.36221    0.19103   1.896  0.05795 .  
+## hour_of_daymorning              0.47460    0.14988   3.167  0.00154 ** 
+## snow_ctghigh                    0.77128    0.42623   1.810  0.07036 .  
+## snow_ctglow                     0.09757    0.39631   0.246  0.80553    
+## prcp_ctghigh                   -0.89831    0.39781  -2.258  0.02394 *  
+## prcp_ctglow                    -0.15267    0.12436  -1.228  0.21959    
+## street_closed                   0.13713    0.16726   0.820  0.41232    
+## neighborhoodWashington Heights  0.04894    0.11289   0.434  0.66464    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2884.1  on 6064  degrees of freedom
+## Residual deviance: 2853.0  on 6052  degrees of freedom
+## AIC: 2879
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>fit_logistic_neighbor %&gt;% 
+    broom::tidy() %&gt;% 
+  mutate(OR = exp(estimate)) %&gt;%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_neighbor))) %&gt;% 
+  select(term, OR, conf.low, conf.high) %&gt;% 
+  filter(term != &#39;(Intercept)&#39;) %&gt;% 
+  mutate(term = c(&quot;Fall&quot;, &quot;Summer&quot;, &quot;Winter&quot;, &quot;Afternoon&quot;, &quot;Dawn&quot;, &quot;Morning&quot;, &quot;snow 50+&quot;, &quot;snow 50-&quot;, &quot;prcp 25+&quot;, &quot;prcp 25-&quot;, &quot;Street closed&quot;, &quot;Washington Heights&quot;))</code></pre>
+<pre><code>## # A tibble: 12 x 4
+##    term                  OR conf.low conf.high
+##    &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 Fall               0.685    0.493     0.947
+##  2 Summer             0.833    0.621     1.12 
+##  3 Winter             1.05     0.783     1.42 
+##  4 Afternoon          1.49     1.13      1.98 
+##  5 Dawn               1.44     0.981     2.08 
+##  6 Morning            1.61     1.20      2.16 
+##  7 snow 50+           2.16     0.863     4.70 
+##  8 snow 50-           1.10     0.471     2.27 
+##  9 prcp 25+           0.407    0.170     0.825
+## 10 prcp 25-           0.858    0.670     1.09 
+## 11 Street closed      1.15     0.822     1.58 
+## 12 Washington Heights 1.05     0.841     1.31</code></pre>
+<p>Washington Height has 1.05 times the odds of response time greater than 8 minutes compared to UWS. However the observed effect is not statistically significant.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
