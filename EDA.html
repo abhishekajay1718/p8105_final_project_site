@@ -544,6 +544,14 @@ for (i in 1:nrow(dat_subset)) {
     check_street_closure(dat_subset$incident_date_time[i], zip = dat_subset$zip_code[i])
 }
 save(dat_subset, file = &quot;data/subset_dat.RData&quot;)</code></pre>
+<pre class="r"><code>dat_subset %&gt;% 
+  mutate(street_closed = as.factor(street_closed)) %&gt;% 
+  ggplot(aes(x = neighborhood, y = response_time, color = street_closed)) + 
+  geom_boxplot()+
+  ylim(0, 20)</code></pre>
+<pre><code>## Warning: Removed 62 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="EDA_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>#actually the difference is really small.  </code></pre>
 </div>
 
 

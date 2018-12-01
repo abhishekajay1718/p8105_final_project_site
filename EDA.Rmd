@@ -293,4 +293,12 @@ for (i in 1:nrow(dat_subset)) {
 save(dat_subset, file = "data/subset_dat.RData")
 ```
 
+```{r}
 
+dat_subset %>% 
+  mutate(street_closed = as.factor(street_closed)) %>% 
+  ggplot(aes(x = neighborhood, y = response_time, color = street_closed)) + 
+  geom_boxplot()+
+  ylim(0, 20)
+#actually the difference is really small.  
+```
