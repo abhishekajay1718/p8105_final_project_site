@@ -1,0 +1,186 @@
+---
+title: "Statistical analysis"
+author: "Youn Kyeong Chang (uni# yc3242)"
+date: "November 28, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(magick)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+theme_set(theme_bw())
+```
+
+```{r finaldata, include = FALSE}
+load('data/finaldat.RData')
+
+finaldat = 
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         over_8min = fct_relevel(over_8min, "8min-")) %>% 
+  select(-over_5min)
+```
+
+## Logistic regression with binary outcome 8min- / 8min+
+```{r}
+finaldat = 
+  finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
+         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
+         season = fct_relevel(season, "Spring"),
+         hour_of_day = fct_relevel(hour_of_day, "night"))
+
+fit_logistic =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
+      family = binomial(), data = finaldat)
+
+summary(fit_logistic)
+
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = c("intercept", "Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-")) %>%   knitr::kable(digits = 3, "html") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+OR_total_df = 
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>%
+  as.tibble() %>% 
+  mutate(ctg = c("intercept", 
+                 "Season", "Season", "Season", 
+                 "Hour of the day", "Hour of the day", "Hour of the day",
+                 "Snow", "Snow",
+                 "Rain", "Rain"),
+         sub_ctg_chr = c("intercept",
+                     "Fall", "Summer", "Winter",
+                     "Afternoon", "Dawn", "Morning",
+                     "50(mm)+", "0-50(mm)",
+                     "25(mm)+", "0-25(mm)"),
+         sub_ctg = c("1", "2", "1", "3", "8", "6", "7", "5", "4", "5", "4")) %>%   
+  filter(ctg != "intercept")  
+
+adj = .2 # This is used in position_nudge to move the dots
+
+OR =
+ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg, 
+                        label = sub_ctg_chr)) +
+  geom_vline(aes(xintercept = 1), size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1.5), size = .6, linetype = "dashed") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "1"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "1"),
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
+            nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
+             size = 6, color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "2"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "2"),
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "2"), 
+             size = 6, color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "3"),
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
+            nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "3"), 
+             size = 6, color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "4"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = +.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "4"),
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue2", 
+            nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
+             size = 6, color = "skyblue2",
+             position = position_nudge(y = +.1)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "5"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "5"),
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue4", 
+            nudge_x = -.16, nudge_y = -.1) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
+             size = 6, color = "skyblue4", 
+             position = position_nudge(y = -.1)) +
+ geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "6"),
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
+            nudge_x = -.14, nudge_y = +.2, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
+             size = 6, color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "7"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "7"),
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
+             size = 6, color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "8"),
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "8"), 
+             size = 6, color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  scale_x_continuous(breaks = c(1, 1.5),
+                     limits = c(.7, 1.8)) +
+  labs(x = "Odds Ratio",
+       y = " ") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        axis.title.x = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 20),
+        legend.position = "None") 
+
+ggsave("OR.png", plot = OR, width = 45, height = 25, units = "cm")
+```
