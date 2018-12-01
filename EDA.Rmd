@@ -10,6 +10,8 @@ library(lubridate)
 library(xml2)
 library(rvest)
 library(rnoaa)
+library(patchwork)
+library(readxl)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -93,6 +95,8 @@ save(nyc_weather_2017, file = "data/nyc_weather_2017.RData")
 
 ```{r merge}
 # incident_dat_2017 
+incident_dat_2017 = incident_dat_2017 %>% 
+  mutate(zip_code = as.numeric(zip_code))
 finaldat =  
   left_join(incident_dat_2017, zip_code_table, by = "zip_code") %>% 
   inner_join(., nyc_weather_2017, by = "date")
