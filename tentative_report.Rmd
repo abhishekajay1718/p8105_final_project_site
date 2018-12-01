@@ -56,7 +56,7 @@ theme_set(theme_bw())
 1. Incident data (response from Fire company)
 ```{r }
 incident_dat_2017 <-
-  read_csv('datafiles/Incidents_Responded_to_by_Fire_Companies.csv',
+  read_csv('data/Incidents_Responded_to_by_Fire_Companies.csv',
   col_types = "cicccicciccccccccccciccccccc") %>%
   janitor::clean_names() %>%
   #recode date/time
