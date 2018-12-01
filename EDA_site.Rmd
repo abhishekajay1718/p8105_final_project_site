@@ -1,6 +1,9 @@
 ---
 title: "Exploratory Data Analysis"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
 ---
 
 In order to figure out the association between response time and each explanatory variables, exploratory data analysis was performed.
