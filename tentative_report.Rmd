@@ -2,7 +2,7 @@
 title: "tentative report"
 output:
   html_document
-  ---
+---
 
 Motivation: Provide an overview of the project goals and motivation.
 
