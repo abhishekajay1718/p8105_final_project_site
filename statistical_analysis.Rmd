@@ -35,8 +35,8 @@ finaldat =
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
-         over_8min = fct_relevel(over_8min, "8min-")) %>% 
-  select(-over_5min)
+         over_8min = fct_relevel(over_8min, "8min-")) 
+# %>%  select(-over_5min)
 ```
 
 ## Logistic regression with binary outcome 8min- / 8min+
