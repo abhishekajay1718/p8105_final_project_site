@@ -32,3 +32,5 @@ $$
 **Hour of the day**
   In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 
+## Subset analysis
+
