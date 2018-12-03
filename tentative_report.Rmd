@@ -1,11 +1,22 @@
 ---
-title: "Tentative_report"
+title: "tentative report"
 output:
-  html_document:
-    toc: true
-    toc_float: true
-    css: style.css
+  html_document
 ---
+
+Motivation: Provide an overview of the project goals and motivation.
+
+Related work: Anything that inspired you, such as a paper, a web site, or something we discussed in class.
+
+Initial questions: What questions are you trying to answer? How did these questions evolve over the course of the project? What new questions did you consider in the course of your analysis?
+
+Data: Source, scraping method, cleaning, etc.
+
+Exploratory analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
+
+Additional analysis: If you undertake formal statistical analyses, describe these in detail
+
+Discussion: What were your findings? Are they what you expect? What insights into the data can you make?
 
 ###Motivation:
 
@@ -13,48 +24,678 @@ A major concern in emergency medical services (EMS) planning has been the need t
 
 Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. Hence, we decided to analyse the EMS response time in New York City in the year 2017 with respect to weather and street blockage so as to improve it.
 
+### Initial questions: 
+We tried to answer the factors assoicated with EMS response time. We assumed rainy or snowy conditions, season and hour of the day will affect the response time. 
+Here are the papers we found that drove the questions of our project.
+<a href = "https://europepmc.org/articles/pmc32251">
+Effect of reducing ambulance response times on deaths from out of hospital cardiac arrest: cohort study</a>
+
+<a href = "https://www.ncbi.nlm.nih.gov/pubmed/22026820">Emergency medical services response time and mortality in an urban setting.</a>
+
+<a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a> This study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. This got us interested in exploring the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
 
 
 
-###About the data:
+### Data Source
+Incidents Responded to by Fire Companies: [https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd] This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is response time which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.
 
-__Incidents Responded to by Fire Companies:__
-[https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd] 
-This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is __response time__ which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.
+The New York City Weather Data [https://www.ncdc.noaa.gov/cdo-web/datasets]
+
+This dataset includes weather records of the city from 2014- 2018. We have restrcited our analysis to 2017 so the data was filtered accordingly. From this dataset, we have selected precipication, snow, snow depth and maximum and minimum temperatures everyday throughout the year.
+
+Street Closure due to Construction data : [https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk] For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.
+
+### Exploratory analysis: 
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(xml2)
+library(rvest)
+library(rnoaa)
+library(knitr)
+library(patchwork)
+library(readxl)
+library(kableExtra)
+library(magick)
+library(broom)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+theme_set(theme_bw())
+```
+
+### Step 1: Data preparation
+1. Incident data (response from Fire company)
+```{r }
+incident_dat_2017 <-
+  read_csv('data/Incidents_Responded_to_by_Fire_Companies.csv',
+  col_types = "cicccicciccccccccccciccccccc") %>%
+  janitor::clean_names() %>%
+  #recode date/time
+  mutate(incident_date_time = mdy_hms(incident_date_time),
+         arrival_date_time = mdy_hms(arrival_date_time)) %>%
+  #select year 2017
+  filter(year(incident_date_time) == 2017,
+         incident_type_desc == "300 - Rescue, EMS incident, other") %>%
+  select(im_incident_key, incident_date_time, arrival_date_time,
+         street_highway:borough_desc) %>%
+  na.omit() %>%
+
+  # Added response time(minute) variable
+  # mutate(response_time = arrival_date_time - incident_date_time) %>%
+  mutate(response_time = difftime(arrival_date_time, incident_date_time, units = 'mins'),
+  # Added hour variable
+  hour = hour(incident_date_time),
+  date = date(incident_date_time),
+  # Added incident_month and incident_day variables from incident_date_time
+  incident_date = as.Date(incident_date_time)) %>%
+  separate(incident_date,
+           into = c("incident_year", "incident_month", "incident_day"),
+           sep = "-") %>%
+  select(-incident_year) %>%
+  mutate(incident_month = as.numeric(incident_month),
+         incident_day = as.numeric(incident_day),
+         zip_code = as.numeric(zip_code))
+
+save(incident_dat_2017, file = "data/incident_dat_2017.RData")
+```
+
+2. Neighborhood variable (by zipcode) dataset
+```{r fig.height = 8}
+url = "https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20"
+
+xml = read_html(url)
+
+zip_code_table = (xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table() %>% 
+  janitor::clean_names() %>%  
+  select(neighborhood, zip_codes) %>% 
+  separate(zip_codes, c("a", "b", "c", "d", "e", "f", "g", "h", "i"), 
+           sep = ",") %>% 
+  gather(key = to_remove, value = zip_code, a:i) %>% 
+  select(-to_remove) %>% 
+  na.omit() %>% 
+  distinct() %>% 
+  mutate(zip_code = as.numeric(zip_code))
+
+save(zip_code_table, file = "data/zipcode.RData")
+```
+
+3. Add weather-related dataset
+```{r}
+library(rnoaa)
+
+nyc_weather_2017 = 
+  rnoaa::meteo_pull_monitors("USW00094728", 
+                             var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
+                             date_min = "2017-01-01", 
+                             date_max = "2017-12-31"
+                             ) %>% 
+  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10) %>% 
+  select(-id)
+
+save(nyc_weather_2017, file = "data/nyc_weather_2017.RData")
+```
+
+4. Merge first three for final dataset
+
+```{r merge}
+# incident_dat_2017 
+finaldat =  
+  left_join(incident_dat_2017, zip_code_table, by = "zip_code") %>% 
+  inner_join(., nyc_weather_2017, by = "date") %>% 
+  mutate(response_time = as.numeric(response_time))
+
+save(finaldat, file = "data/finaldat.RData")
+
+load('data/finaldat.RData')
+```
+
+Given that data of response time is right skewed, for visulization, we took a mean of response time as our outcome for exploratory analysis And then performed exploratory data analysis. 
 
 
-__The New York City Weather Data__ [https://www.ncdc.noaa.gov/cdo-web/datasets] 
+### Step 2: Initial analysis (obsolete)
+#### Step 2-1: EDA
 
-This dataset includes weather records of the city from 2014- 2018. We have restrcited our analysis to 2017 so the data was filtered accordingly. From this dataset, we have selected _precipication_, _snow_, _snow depth_ and _maximum and minimum temperatures_ everyday throughout the year.
+1. Hourly trend of response time
+```{r}
+finaldat %>%
+  group_by(hour) %>% 
+  ggplot(aes(x = hour, y = response_time)) + 
+  geom_smooth(se = FALSE) 
+```
+
+2. Response time in rainy and snowy days
+```{r}
+finaldat %>% 
+  mutate(prcp = prcp > 0) %>%
+  group_by(date, prcp) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = prcp, y = mean_resp_time)) +
+  geom_violin(aes(fill = factor(prcp)), alpha = .5) +
+  stat_summary(fun.y = mean, geom = "point", size = 4, color = "blue") +
+  labs(
+    title = "Mean Response time in rainy conditions",
+    x = "Precipitation",
+    y = "Response time"
+  ) +
+  viridis::scale_fill_viridis(
+    name = "Precipitation",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(color = "white", face = "bold"),
+        legend.position = "None") 
+
+finaldat %>% 
+  mutate(snow = snow > 0) %>%
+  group_by(date, snow) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = snow, y = mean_resp_time)) +
+  geom_violin(aes(fill = factor(snow)), alpha = .5) +
+  stat_summary(fun.y = mean, geom = "point", size = 4, color = "blue") +
+  labs(
+    title = "Mean response time in snowy conditions",
+    y = "Mean response time",
+    x = "Snow"
+  ) +
+  viridis::scale_fill_viridis(
+    name = "Snow",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(color = "white", face = "bold"),
+        legend.position = "None") 
+```
+
+We showed some trends by hour of the day and by snowy conditions. Based on this result, we fit linear regression. 
+
+#### Step 2-2: Linear regression 
+1. hour of the day vs response time 
+
+```{r}
+fit_hour = lm(response_time ~ hour, data = finaldat)
+fit_hour %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+Ho: different hour of the day makes no difference in logs response time.
+p-value: very small.
+conclusion: There is a difference of log response time in different time/hour of the day.
+
+2. snow & prcp vs response time ----- linear regression
+```{r}
+fit_snow = lm(response_time~snow, data = finaldat)
+fit_snow %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+
+fit_prcp = lm(response_time~prcp, data = finaldat)
+fit_prcp %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+H0: There is no correlation between snow and log_response_time
+p-value: very small
+estimate: positive
+conclusion: There is a positive correlation between snow and log response time. 
+3. MLR based on snow, prcp, tmax, tmin(factors of nature environment) in different hour of the day
+```{r}
+fit_mlr = lm(response_time~snow + prcp + tmax + tmin, data = finaldat)
+
+fit_mlr %>% 
+  broom::tidy() %>% 
+  knitr::kable(digits = 3)
+```
+
+Even though we could get the statistically significant results with p-values less than 0.05, the estimates are too small so explanations from this was not meaningful. 
+
+### Step 3: final analysis
+#### Step 3-1: Modify variables 
+Next, we categorized explanatory variables since we wanted to show the change of response time by the trend of precipitation, snow, season and time rather than by detailed amount of precipitation and snow or specific time. With these modified variables, we performed exploratory data analysis.
+
+```{r finaldata, include = FALSE}
+finaldat = 
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         over_8min = fct_relevel(over_8min, "8min-")) 
+```
+
+#### Step 3-2:EDA based on modified variables
+
+1. precipitation and snow
+```{r}
+prcp_eda =
+  finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%   group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Rainy conditions",
+    y = "Mean response time(min)",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-25(mm)", "25(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Precipitation",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
+        legend.position = "None") 
+
+snow_eda =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>%   group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Snowy conditions",
+    y = "",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-50(mm)", "50(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Snow",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
+        legend.position = "None") 
+
+prcp_snow = prcp_eda + snow_eda 
+ggsave("prcp_snow.png", plot = prcp_snow)
+```
+
+2. Season
+```{r}
+season_eda =
+finaldat %>% 
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
+  group_by(date, season) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = season, y = mean_resp_time)) +
+  geom_violin(aes(fill = season), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    y = "Mean response time (min)",
+    x = " "
+  ) +
+  viridis::scale_fill_viridis(
+    name = "season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
+        legend.position = "None") 
+
+ggsave("season.png", plot = season_eda)
+```
+
+3. Hour
+```{r}
+hour_eda =
+finaldat %>%
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
+  labs(
+    x = " ", 
+    y = "Mean response time (min)"
+    ) +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE)
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = "None") 
+
+ggsave("hour.png", plot = hour_eda)
+```
+
+Accordingly, based on medical research, using a fact that 8min is a critical point, we categorized response time into binary outcome as less than 8min and over 8min.   
+
+#### Step 3-3:Logistic regression
+```{r}
+fit_logistic =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
+      family = binomial(), data = finaldat)
+
+summary(fit_logistic)
+
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>% 
+  mutate(term = c("intercept", "Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-")) %>%   knitr::kable(digits = 3, "html") %>% kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 
 
-__Street Closure due to Construction data__ :
-[https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk]
-For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.
+OR_total_df = 
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>%
+  as.tibble() %>% 
+  mutate(ctg = c("intercept", 
+                 "Season", "Season", "Season", 
+                 "Hour of the day", "Hour of the day", "Hour of the day",
+                 "Snow", "Snow",
+                 "Rain", "Rain"),
+         sub_ctg_chr = c("intercept",
+                     "Fall", "Summer", "Winter",
+                     "Afternoon", "Dawn", "Morning",
+                     "50(mm)+", "0-50(mm)",
+                     "25(mm)+", "0-25(mm)"),
+         sub_ctg = c("1", "2", "1", "3", "8", "6", "7", "5", "4", "5", "4")) %>%   
+  filter(ctg != "intercept")  
 
-Additionally, since our data contained only zip code, we matched the neighbourhood table given [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes.
+adj = .2 # This is used in position_nudge to move the dots
 
+OR =
+ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg, 
+                        label = sub_ctg_chr)) +
+  geom_vline(aes(xintercept = 1), size = 1, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1.5), size = .6, linetype = "dashed") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "1"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "1"),
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
+            nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
+             size = 6, color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "2"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "2"),
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "2"), 
+             size = 6, color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "3"),
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
+            nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "3"), 
+             size = 6, color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "4"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = +.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "4"),
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue2", 
+            nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
+             size = 6, color = "skyblue2",
+             position = position_nudge(y = +.1)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "5"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "5"),
+            aes(label = sub_ctg_chr), size = 6, colour = "skyblue4", 
+            nudge_x = -.16, nudge_y = -.1) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
+             size = 6, color = "skyblue4", 
+             position = position_nudge(y = -.1)) +
+ geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "6"),
+            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
+            nudge_x = -.14, nudge_y = +.2, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
+             size = 6, color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "7"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "7"),
+            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
+             size = 6, color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 size = .5, height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "8"),
+            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "8"), 
+             size = 6, color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  scale_x_continuous(breaks = c(1, 1.5),
+                     limits = c(.7, 1.8)) +
+  labs(x = "Odds Ratio",
+       y = " ") +
+  theme_bw() +
+  theme(panel.grid.minor = element_blank(),
+        axis.title.x = element_text(size = 16),
+        axis.text.x = element_text(size = 16),
+        axis.text.y = element_text(size = 20),
+        legend.position = "None") 
 
-Since these datasets were obtained from different sources, incident data and weather data were merged together by the "date" variable. Further, incident data was seperated into day,month and year variables which helped us categorise different seasons by month, time of day(morning, evening etc.). A seperate variable was name categorizing response time above or below 8 mins since it is generally accepted within the field that an 'ideal' response time for emergency calls would be within eight minutes, ninety-percent of the time. Precipitation from weather data was also categorized into high, medium and low to conduct our analysis on.
+ggsave("OR.png", plot = OR, width = 45, height = 25, units = "cm")
+```
 
+Based on EDA, to get statistical analysis, we fit logistic regression and results are followings: 
+- Snow: As expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm snow and 47% by over 50mm snow.
+- Season: Compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%.
+- Rain: Statistically significant result was not obtained from rain variable and it matches the result of EDA.
+- Hour of the day: In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 
-###Questions that drove our analysis:
-* How is the response time affected by the weather specifically when it is snowing or raining or by seasons?
+### step 4
+When we wish to summarize the street closure data to get another variable to explain the response time, we realize that is pretty hard to do. Since the original street closure data is recorded based on street junctions, and there is not a zipcode variable included, we need to connect zipcode to every street junction in the dataset in order to merge it with the incident data. This required a lot of work, and thus we only did it with two neighborhood areas, the UWS and Washington Heights. We then matched the neighbourhood with the zip codes, for us to filter the selected neighborhood in both the incident and the street closure data to create a subset.
 
-* How often does the EMS arrive within ideal time(8mins)?
+#### step 4-1 data cleaning for original street closure data 
+```{r}
+street_closure_2017 <-  
+  read_csv('data/Street_Closures_due_to_construction_activities_by_Intersection.csv') %>% 
+  janitor::clean_names() %>% 
+  #recode date/time
+  mutate(work_start_date = mdy_hms(work_start_date),
+         work_end_date = mdy_hms(work_end_date),
+         work_time = round(difftime(work_end_date, work_start_date, 
+                                    units = 'days'), 0)) %>% 
+  #select year 2017
+  filter(year(work_start_date) == 2017) %>% 
+  select(-purpose) %>% 
+  na.omit() %>% 
+  mutate(A = toupper(str_replace_all(onstreetname, fixed(" "), "")),
+         B = toupper(str_replace_all(fromstreetname, fixed(" "), "")))
+save(street_closure_2017, file = "data/street_closure_2017.RData")
+```
 
-* How is different during different times of the day?
+#### step 4-2 Add street closure data and create subset data for UWS and WH
+```{r}
+#list of streets of intereste
+street_zip <- read_excel('street_junctions_zipcode.xlsx') %>% 
+  #delete white space from street name 
+  mutate(A = toupper(str_replace_all(street_A, fixed(" "), "")),
+         B = toupper(str_replace_all(street_B, fixed(" "), "")))
+# Extract street closure data based on street_zip
+#Merge A to A and B to B
+first_set <- street_zip %>% 
+  inner_join(street_closure_2017, by = c("A", "B"))
+#Merge A to B and B to A
+second_set <- street_zip %>% 
+  inner_join(street_closure_2017, by = c("A" = 'B', 'B' = "A"))
+street_closure_UWS_WH <- first_set %>% 
+  bind_rows(second_set) %>% 
+  select(street_A:neighborhood, work_start_date:work_time)
+#Create function that checks the closure duration whether it happens while the call was made
+check_street_closure <- function(datetime, zip){
+  #Filter only the zipcode of interest
+  zipcode_closure <- street_closure_UWS_WH %>% 
+    filter(zipcode == zip) %>% 
+    mutate(street_closed = ifelse(work_start_date < datetime & work_end_date > datetime, 1, 0))
+  
+  if( sum(zipcode_closure$street_closed) > 0){
+    return(1)
+  } else {return(0)}
+}
+#Then create variable street closure (y/n) in the incident_dat_2017 focusing on Washington heights and UWS
+dat_subset <- finaldat %>%
+  filter(zip_code %in% c(10023, 10024, 10025, 10032, 10033, 10040)) 
+#Down to 6065 observations
+dat_subset$street_closed <- NA
+for (i in 1:nrow(dat_subset)) {
+  dat_subset$street_closed[i] <- 
+    check_street_closure(dat_subset$incident_date_time[i], zip = dat_subset$zip_code[i])
+}
+save(dat_subset, file = "data/subset_dat.RData")
+```
 
+#### step 4-3 Logistic regression and visualization with among UWS and Washington Heights
+```{r}
+uws_dat <- subset %>% filter(neighborhood == 'Upper West Side')
+fit_logistic_uws =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = uws_dat)
 
-*  [This](https://www.ncbi.nlm.nih.gov/pubmed/29381111) study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. So we thought what is the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
+summary(fit_logistic_uws)
+```
 
+```{r}
+wash_dat <- subset %>% filter(neighborhood == 'Washington Heights')
 
+fit_logistic_wash =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = wash_dat)
 
+summary(fit_logistic_wash)
+```
 
-###Limitations of our analysis:
+```{r}
+#Prepare table for visualization
+table_results_uws <-  fit_logistic_uws %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_uws))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
+         neightborhood = 'UWS') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_uws %>% 
+  knitr::kable(digits = 3, "html") %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 
+```
 
-* response time 'clock' almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.
+```{r}
+table_results_wash <-  fit_logistic_wash %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_wash))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
+         neightborhood = 'Washington Heights') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_wash %>% 
+  knitr::kable(digits = 3, "html") %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
 
+```{r plot_OR}
+OR_UWS =
+ggplot(table_results_uws, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
 
+OR_WASH =
+ggplot(table_results_wash, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
+  
+OR_all <- 
+  table_results_uws %>% bind_rows(table_results_wash) %>% 
+  ggplot(., aes(x = term, y = OR, colour = neightborhood)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high), 
+     position = position_dodge(width = 0.30)) +
+     coord_flip() + xlab('') + ylab('Odds ratio') 
+ggsave("OR_all.png", plot = OR_all, width = 45, height = 25, units = "cm")
+```
 
+#### step 4-4 Fitting regression model by neightborhood
+On UWS, high precipitation is associated with lower odds of response times greater than 8 minutes. What's interesting here is why? Street closure is associated with the outcome but not statistically significant.
+Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. 
+-It's either linking street closure to the zip code in this case is too broad or street closure did not really play a role in response time- 
+
+```{r}
+fit_logistic_neighbor =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, family = binomial(), data = subset)
+
+summary(fit_logistic_neighbor)
+
+fit_logistic_neighbor %>% 
+    broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_neighbor))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed", "Washington Heights"))
+
+```
+Washington Height has 1.05 times the odds of response time greater than 8 minutes compared to UWS. However the observed effect is not statistically significant.
+
+### Discussion: 
+We combined and merged multiple variables into our final dataset. These variables are prcp_ctg(categorized), snow_ctg, season, hour of the day. These graphs show us that there is a slight increase in mean response time when precipitation is heavy; there is an increase in mean response time when snowy condition presented. When analyzing with the season variables, mean response time is slightly increased in winter, which may be explained along with snow variable. On the other hand, when analyzing the effect of the hour of the day on mean response time, It seems that response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night later in our statistical model analysis. 
+
+As we first tried the linear regression we found out that despite the significant p value, the estimate of the variables are very small. We wanted to change to another statistical method to get relatively meaningful result. We summarize the continuous response time in to binary outcomes, about whether it is higher than 8 mins or not. We also categorized the snow and prcp into binary variables. The model we chose is here: 
+$$
+\begin{aligned}
+&logit(P(response\space time > 8 min))\\
+&= \beta_{0} + \beta_{1}I(season = Fall) + \beta_{2}I(season = Summer) + \beta_{3}I(season = Winter) \\
+& + \beta_{4}I(hour\space of \space day = afternoon) + \beta_{5}I(hour\space of \space day = dawn) + \beta_{6}I(hour\space of \space day = morning) \\
+& + \beta_{7}I(snow = 50mm+) + \beta_{8}I(snow = 50mm-) + \beta_{9}I(prcp = 25mm+) + \beta_{10}I(prcp = 25mm-) 
+\end{aligned}
+$$
+In the Odd Ratio table generated frm the code in the above section, we found out that as expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm snow and 47% by over 50mm snow. In summary of the effect of seasons, compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%. For the rainy condition, statistically significant result was not obtained from prcp variable and it matches the result of EDA. Furthermore, in reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%. It seems like the emergency service in our city is more or less affected by snowy condition, and somewhat delayed in the morning. Further research can be planned to investigate the causation of that, but there is something important to keep in mind that: the avarage response time is pretty small, and most the of recorded response times are lower than 8 minutes. Thus so far we do not need to worry about the medical emergency service provided in our city. 
+
+On the other hand, we have construct logistic analysis on our subset filtered with neighborhood area variables, UMS, and Washington Heights in specific. On Upper West Side, high precipitation is associated with lower odds of response times greater than 8 minutes. What’s interesting here is why? Street closure is associated with the outcome but not statistically significant. Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. The null result from street closure could be due to either linking street closure to the zip code in this case is too broad or street closure did not really play a role in our response time. PS. We also fitted the model with neighborhood as predictor variable and found that Washington Heights had 1.05 times the odds of response time greater than 8 minutes compared to the Upper West Side. However the observed effect is not statistically significant. At least we can be rest assured whether where we live, we still receive equal treatment from the emergency dispatcher.

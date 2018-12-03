@@ -13,7 +13,7 @@
 
 <meta name="date" content="2018-11-28" />
 
-<title>EDA</title>
+<title>Exploratory Data Analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -21,9 +21,6 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -175,101 +172,6 @@ $(document).ready(function () {
 
 
 
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
-
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
-
-
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -288,19 +190,19 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="tentative_report.html">Report</a>
+  <a href="Introduction.html">Introduction</a>
+</li>
+<li>
+  <a href="EDA_site.html">EDA</a>
+</li>
+<li>
+  <a href="statistical_analysis_site.html">Result</a>
+</li>
+<li>
+  <a href="conclusion_site.html">Conclusion</a>
 </li>
 <li>
   <a href="flexdashboard.html">Data Dashboard</a>
-</li>
-<li>
-  <a href="EDA.html">EDA</a>
-</li>
-<li>
-  <a href="statistical_analysis.html">Statistical Analysis</a>
-</li>
-<li>
-  <a href="about.html">About</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -323,19 +225,337 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">EDA</h1>
+<h1 class="title toc-ignore">Exploratory Data Analysis</h1>
 <h4 class="author"><em>Youn Kyeong Chang (uni# yc3242)</em></h4>
 <h4 class="date"><em>November 28, 2018</em></h4>
 
 </div>
 
 
-<pre class="r"><code>load(&#39;data/finaldat.RData&#39;)</code></pre>
+<div id="data-preparationdownload-the-original-two-dataset-from-the-link-into-the-.data-folder-to-run-the-code-below" class="section level2">
+<h2>Data preparation(Download the original two dataset from the link into the ‘./data/’ folder to run the code below)</h2>
+</div>
+<div id="incident-data-response-from-fire-company" class="section level2">
+<h2>Incident data (response from Fire company)</h2>
+<pre class="r"><code>incident_dat_2017 &lt;-  
+  read_csv(&#39;data/Incidents_Responded_to_by_Fire_Companies.csv&#39;,
+  col_types = &quot;cicccicciccccccccccciccccccc&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  #recode date/time
+  mutate(incident_date_time = mdy_hms(incident_date_time),
+         arrival_date_time = mdy_hms(arrival_date_time)) %&gt;% 
+  #select year 2017
+  filter(year(incident_date_time) == 2017,
+         incident_type_desc == &quot;300 - Rescue, EMS incident, other&quot;) %&gt;% 
+  select(im_incident_key, incident_date_time, arrival_date_time,
+         street_highway:borough_desc) %&gt;% 
+  na.omit() %&gt;% 
 
+  # Added response time(minute) variable
+  # mutate(response_time = arrival_date_time - incident_date_time) %&gt;%
+  mutate(response_time = difftime(arrival_date_time, incident_date_time, units = &#39;mins&#39;),
+  # Added hour variable
+  hour = hour(incident_date_time),
+  date = date(incident_date_time),
+  # Added incident_month and incident_day variables from incident_date_time
+  incident_date = as.Date(incident_date_time)) %&gt;% 
+  separate(incident_date, 
+           into = c(&quot;incident_year&quot;, &quot;incident_month&quot;, &quot;incident_day&quot;), 
+           sep = &quot;-&quot;) %&gt;% 
+  select(-incident_year) %&gt;% 
+  mutate(incident_month = as.numeric(incident_month),
+         incident_day = as.numeric(incident_day))</code></pre>
+<pre><code>## Warning: Unnamed `col_types` should have the same length as `col_names`.
+## Using smaller of the two.</code></pre>
+<pre><code>## Warning in rbind(names(probs), probs_f): number of columns of result is not
+## a multiple of vector length (arg 1)</code></pre>
+<pre><code>## Warning: 13119 parsing failures.
+## row # A tibble: 5 x 5 col     row col        expected       actual            file                   expected   &lt;int&gt; &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;             &lt;chr&gt;                  actual 1    91 FIRE_SPRE… no trailing c… &quot; - Beyond build… &#39;data/Incidents_Respo… file 2   199 FIRE_SPRE… no trailing c… &quot; - Confined to … &#39;data/Incidents_Respo… row 3   440 FIRE_SPRE… no trailing c… &quot; - Confined to … &#39;data/Incidents_Respo… col 4   492 FIRE_SPRE… no trailing c… &quot; - Confined to … &#39;data/Incidents_Respo… expected 5   569 FIRE_SPRE… no trailing c… &quot; - Confined to … &#39;data/Incidents_Respo…
+## ... ................. ... .......................................................................... ........ .......................................................................... ...... .......................................................................... .... .......................................................................... ... .......................................................................... ... .......................................................................... ........ ..........................................................................
+## See problems(...) for more details.</code></pre>
+<pre class="r"><code>save(incident_dat_2017, file = &quot;data/incident_dat_2017.RData&quot;)</code></pre>
+</div>
+<div id="neighborhood-variable-by-zipcode-dataset" class="section level2">
+<h2>Neighborhood variable (by zipcode) dataset</h2>
+<pre class="r"><code>url = &quot;https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20&quot;
 
+xml = read_html(url)
 
+zip_code_table = (xml %&gt;% html_nodes(css = &quot;table&quot;)) %&gt;% 
+  .[[1]] %&gt;%
+  html_table() %&gt;% 
+  janitor::clean_names() %&gt;%  
+  select(neighborhood, zip_codes) %&gt;% 
+  separate(zip_codes, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;, &quot;f&quot;, &quot;g&quot;, &quot;h&quot;, &quot;i&quot;), 
+           sep = &quot;,&quot;) %&gt;% 
+  gather(key = to_remove, value = zip_code, a:i) %&gt;% 
+  select(-to_remove) %&gt;% 
+  na.omit() %&gt;% 
+  distinct() %&gt;% 
+  mutate(zip_code = as.numeric(zip_code))</code></pre>
+<pre><code>## Warning: Expected 9 pieces. Missing pieces filled with `NA` in 41 rows [1,
+## 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...].</code></pre>
+<pre class="r"><code>save(zip_code_table, file = &quot;data/zipcode.RData&quot;)</code></pre>
+</div>
+<div id="add-weather-related-dataset" class="section level2">
+<h2>Add weather-related dataset</h2>
+<pre class="r"><code>library(rnoaa)
+
+nyc_weather_2017 = 
+  rnoaa::meteo_pull_monitors(&quot;USW00094728&quot;, 
+                             var = c(&quot;PRCP&quot;, &quot;TMIN&quot;, &quot;TMAX&quot;, &quot;SNOW&quot;, &quot;SNWD&quot;), 
+                             date_min = &quot;2017-01-01&quot;, 
+                             date_max = &quot;2017-12-31&quot;
+                             ) %&gt;% 
+  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10) %&gt;% 
+  select(-id)
+
+save(nyc_weather_2017, file = &quot;data/nyc_weather_2017.RData&quot;)</code></pre>
+</div>
+<div id="merge-first-three-for-final-dataset" class="section level2">
+<h2>Merge first three for final dataset</h2>
+<pre class="r"><code># incident_dat_2017 
+incident_dat_2017 = incident_dat_2017 %&gt;% 
+  mutate(zip_code = as.numeric(zip_code))
+finaldat =  
+  left_join(incident_dat_2017, zip_code_table, by = &quot;zip_code&quot;) %&gt;% 
+  inner_join(., nyc_weather_2017, by = &quot;date&quot;)
+
+save(finaldat, file = &quot;data/finaldat.RData&quot;)</code></pre>
+</div>
+<div id="add-additional-variables-and-save-finaldat-in-data" class="section level2">
+<h2>Add additional variables and save finaldat in /data</h2>
+</div>
+<div id="eda" class="section level2">
+<h2>EDA</h2>
+<div id="precipitation-and-snow" class="section level4">
+<h4>precipitation and snow</h4>
+<pre class="r"><code>prcp_eda =
+finaldat %&gt;% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c(&quot;no_prcp&quot;, &quot;low&quot;, &quot;high&quot;))) %&gt;% 
+  group_by(date, prcp_ctg) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    title = &quot;Rainy conditions&quot;,
+    y = &quot;Mean response time(min)&quot;,
+    x = &quot; &quot;
+  ) +
+  scale_x_discrete(labels = c(&quot;0(mm)&quot;, &quot;0-25(mm)&quot;, &quot;25(mm)+&quot;)) +
+  viridis::scale_fill_viridis(
+    name = &quot;Precipitation&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
+        legend.position = &quot;None&quot;) 
+
+snow_eda =
+  finaldat %&gt;% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c(&quot;no_snow&quot;, &quot;low&quot;, &quot;high&quot;))) %&gt;% 
+  group_by(date, snow_ctg) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    title = &quot;Snowy conditions&quot;,
+    y = &quot;&quot;,
+    x = &quot; &quot;
+  ) +
+  scale_x_discrete(labels = c(&quot;0(mm)&quot;, &quot;0-50(mm)&quot;, &quot;50(mm)+&quot;)) +
+  viridis::scale_fill_viridis(
+    name = &quot;Snow&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
+        legend.position = &quot;None&quot;) 
+
+prcp_snow = prcp_eda + snow_eda
+
+ggsave(&quot;prcp_snow.png&quot;, plot = prcp_snow)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.
+## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+</div>
+<div id="season" class="section level4">
+<h4>Season</h4>
+<pre class="r"><code>season_eda =
+finaldat %&gt;% 
+  mutate(season = fct_relevel(season, c(&quot;Spring&quot;, &quot;Summer&quot;, &quot;Fall&quot;, &quot;Winter&quot;))) %&gt;% 
+  group_by(date, season) %&gt;% 
+  summarise(mean_resp_time = mean(response_time)) %&gt;% 
+  ggplot(aes(x = season, y = mean_resp_time)) +
+  geom_violin(aes(fill = season), alpha = .3) +
+  stat_summary(fun.y = mean, geom = &quot;point&quot;, size = 2, color = &quot;blue&quot;) +
+  labs(
+    y = &quot;Mean response time (min)&quot;,
+    x = &quot; &quot;
+  ) +
+  viridis::scale_fill_viridis(
+    name = &quot;season&quot;,
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
+        legend.position = &quot;None&quot;) 
+
+ggsave(&quot;season.png&quot;, plot = season_eda)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+</div>
+<div id="hour" class="section level4">
+<h4>Hour</h4>
+<pre class="r"><code>hour_eda =
+finaldat %&gt;%
+  group_by(hour, season) %&gt;% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c(&quot;6am&quot;, &quot;12pm&quot;, &quot;18pm&quot;)) +
+  geom_vline(xintercept = c(6, 12, 18), color = &quot;darkred&quot;) +
+  labs(
+    x = &quot; &quot;, 
+    y = &quot;Mean response time (min)&quot;
+    ) +
+   viridis::scale_color_viridis(
+    name = &quot;Season&quot;,
+    discrete = TRUE)
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = &quot;None&quot;) </code></pre>
+<pre><code>## List of 4
+##  $ axis.title.y   :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 10
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ axis.text.x    :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 12
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  $ legend.position: chr &quot;None&quot;
+##  $ plot.title     :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : num 13
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, &quot;class&quot;)= chr [1:2] &quot;element_text&quot; &quot;element&quot;
+##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
+##  - attr(*, &quot;complete&quot;)= logi FALSE
+##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
+<pre class="r"><code>ggsave(&quot;hour.png&quot;, plot = hour_eda)</code></pre>
+<pre><code>## Saving 7 x 5 in image</code></pre>
+<pre><code>## Don&#39;t know how to automatically pick scale for object of type difftime. Defaulting to continuous.</code></pre>
+<pre><code>## `geom_smooth()` using method = &#39;gam&#39; and formula &#39;y ~ s(x, bs = &quot;cs&quot;)&#39;</code></pre>
 </div>
 </div>
+<div id="street-closure-data" class="section level2">
+<h2>Street closure data</h2>
+<pre class="r"><code>street_closure_2017 &lt;-  
+  read_csv(&#39;data/Street_Closures_due_to_construction_activities_by_Intersection.csv&#39;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  #recode date/time
+  mutate(work_start_date = mdy_hms(work_start_date),
+         work_end_date = mdy_hms(work_end_date),
+         work_time = round(difftime(work_end_date, work_start_date, 
+                                    units = &#39;days&#39;), 0)) %&gt;% 
+  #select year 2017
+  filter(year(work_start_date) == 2017) %&gt;% 
+  select(-purpose) %&gt;% 
+  na.omit() %&gt;% 
+  mutate(A = toupper(str_replace_all(onstreetname, fixed(&quot; &quot;), &quot;&quot;)),
+         B = toupper(str_replace_all(fromstreetname, fixed(&quot; &quot;), &quot;&quot;)))</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   NODEID = col_integer(),
+##   ONSTREETNAME = col_character(),
+##   FROMSTREETNAME = col_character(),
+##   BOROUGH_CODE = col_character(),
+##   WORK_START_DATE = col_character(),
+##   WORK_END_DATE = col_character(),
+##   PURPOSE = col_character()
+## )</code></pre>
+<pre class="r"><code>save(street_closure_2017, file = &quot;data/street_closure_2017.RData&quot;)</code></pre>
+</div>
+<div id="add-street-closure-data-and-create-subset-data-for-uws-and-wh" class="section level2">
+<h2>Add street closure data and create subset data for UWS and WH</h2>
+<pre class="r"><code>#list of streets of intereste
+street_zip &lt;- read_excel(&#39;street_junctions_zipcode.xlsx&#39;) %&gt;% 
+  #delete white space from street name 
+  mutate(A = toupper(str_replace_all(street_A, fixed(&quot; &quot;), &quot;&quot;)),
+         B = toupper(str_replace_all(street_B, fixed(&quot; &quot;), &quot;&quot;)))
+# Extract street closure data based on street_zip
+#Merge A to A and B to B
+first_set &lt;- street_zip %&gt;% 
+  inner_join(street_closure_2017, by = c(&quot;A&quot;, &quot;B&quot;))
+#Merge A to B and B to A
+second_set &lt;- street_zip %&gt;% 
+  inner_join(street_closure_2017, by = c(&quot;A&quot; = &#39;B&#39;, &#39;B&#39; = &quot;A&quot;))
+street_closure_UWS_WH &lt;- first_set %&gt;% 
+  bind_rows(second_set) %&gt;% 
+  select(street_A:neighborhood, work_start_date:work_time)
+#Create function that checks the closure duration whether it happens while the call was made
+check_street_closure &lt;- function(datetime, zip){
+  #Filter only the zipcode of interest
+  zipcode_closure &lt;- street_closure_UWS_WH %&gt;% 
+    filter(zipcode == zip) %&gt;% 
+    mutate(street_closed = ifelse(work_start_date &lt; datetime &amp; work_end_date &gt; datetime, 1, 0))
+  
+  if( sum(zipcode_closure$street_closed) &gt; 0){
+    return(1)
+  } else {return(0)}
+}
+#Then create variable street closure (y/n) in the incident_dat_2017 focusing on Washington heights and UWS
+dat_subset &lt;- finaldat %&gt;%
+  filter(zip_code %in% c(10023, 10024, 10025, 10032, 10033, 10040)) 
+#Down to 6065 observations
+dat_subset$street_closed &lt;- NA
+for (i in 1:nrow(dat_subset)) {
+  dat_subset$street_closed[i] &lt;- 
+    check_street_closure(dat_subset$incident_date_time[i], zip = dat_subset$zip_code[i])
+}
+save(dat_subset, file = &quot;data/subset_dat.RData&quot;)</code></pre>
+<pre class="r"><code>dat_subset %&gt;% 
+  mutate(street_closed = as.factor(street_closed)) %&gt;% 
+  ggplot(aes(x = neighborhood, y = response_time, color = street_closed)) + 
+  geom_boxplot()+
+  ylim(0, 20)</code></pre>
+<pre><code>## Warning: Removed 62 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="EDA_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>#actually the difference is really small.  </code></pre>
+</div>
+
+
+
 
 </div>
 

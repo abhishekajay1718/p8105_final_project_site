@@ -1,14 +1,304 @@
 ---
-title: "EDA"
+title: "Exploratory Data Analysis"
 author: "Youn Kyeong Chang (uni# yc3242)"
 date: "November 28, 2018"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+library(xml2)
+library(rvest)
+library(rnoaa)
+library(patchwork)
+library(readxl)
+
 knitr::opts_chunk$set(echo = TRUE)
+
+theme_set(theme_bw())
 ```
 
-```{r finaldata}
+## Data preparation(Download the original two dataset from the link into the './data/' folder to run the code below)
+## Incident data (response from Fire company)
+```{r }
+incident_dat_2017 <-  
+  read_csv('data/Incidents_Responded_to_by_Fire_Companies.csv',
+  col_types = "cicccicciccccccccccciccccccc") %>% 
+  janitor::clean_names() %>% 
+  #recode date/time
+  mutate(incident_date_time = mdy_hms(incident_date_time),
+         arrival_date_time = mdy_hms(arrival_date_time)) %>% 
+  #select year 2017
+  filter(year(incident_date_time) == 2017,
+         incident_type_desc == "300 - Rescue, EMS incident, other") %>% 
+  select(im_incident_key, incident_date_time, arrival_date_time,
+         street_highway:borough_desc) %>% 
+  na.omit() %>% 
+
+  # Added response time(minute) variable
+  # mutate(response_time = arrival_date_time - incident_date_time) %>%
+  mutate(response_time = difftime(arrival_date_time, incident_date_time, units = 'mins'),
+  # Added hour variable
+  hour = hour(incident_date_time),
+  date = date(incident_date_time),
+  # Added incident_month and incident_day variables from incident_date_time
+  incident_date = as.Date(incident_date_time)) %>% 
+  separate(incident_date, 
+           into = c("incident_year", "incident_month", "incident_day"), 
+           sep = "-") %>% 
+  select(-incident_year) %>% 
+  mutate(incident_month = as.numeric(incident_month),
+         incident_day = as.numeric(incident_day))
+
+save(incident_dat_2017, file = "data/incident_dat_2017.RData")
+```
+
+## Neighborhood variable (by zipcode) dataset
+```{r fig.height = 8}
+url = "https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20"
+
+xml = read_html(url)
+
+zip_code_table = (xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table() %>% 
+  janitor::clean_names() %>%  
+  select(neighborhood, zip_codes) %>% 
+  separate(zip_codes, c("a", "b", "c", "d", "e", "f", "g", "h", "i"), 
+           sep = ",") %>% 
+  gather(key = to_remove, value = zip_code, a:i) %>% 
+  select(-to_remove) %>% 
+  na.omit() %>% 
+  distinct() %>% 
+  mutate(zip_code = as.numeric(zip_code))
+
+save(zip_code_table, file = "data/zipcode.RData")
+```
+
+## Add weather-related dataset
+```{r}
+library(rnoaa)
+
+nyc_weather_2017 = 
+  rnoaa::meteo_pull_monitors("USW00094728", 
+                             var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
+                             date_min = "2017-01-01", 
+                             date_max = "2017-12-31"
+                             ) %>% 
+  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10) %>% 
+  select(-id)
+
+save(nyc_weather_2017, file = "data/nyc_weather_2017.RData")
+```
+
+## Merge first three for final dataset
+
+```{r merge}
+# incident_dat_2017 
+incident_dat_2017 = incident_dat_2017 %>% 
+  mutate(zip_code = as.numeric(zip_code))
+finaldat =  
+  left_join(incident_dat_2017, zip_code_table, by = "zip_code") %>% 
+  inner_join(., nyc_weather_2017, by = "date")
+
+save(finaldat, file = "data/finaldat.RData")
+```
+
+## Add additional variables and save finaldat in /data
+
+```{r finaldata, include = FALSE}
 load('data/finaldat.RData')
+
+finaldat = 
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         over_8min = fct_relevel(over_8min, "8min-")) 
+```
+
+## EDA
+
+#### precipitation and snow
+```{r}
+prcp_eda =
+finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>% 
+  group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Rainy conditions",
+    y = "Mean response time(min)",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-25(mm)", "25(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Precipitation",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
+        legend.position = "None") 
+
+snow_eda =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>% 
+  group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Snowy conditions",
+    y = "",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-50(mm)", "50(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Snow",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
+        legend.position = "None") 
+
+prcp_snow = prcp_eda + snow_eda
+
+ggsave("prcp_snow.png", plot = prcp_snow)
+```
+
+#### Season
+```{r}
+season_eda =
+finaldat %>% 
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
+  group_by(date, season) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = season, y = mean_resp_time)) +
+  geom_violin(aes(fill = season), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    y = "Mean response time (min)",
+    x = " "
+  ) +
+  viridis::scale_fill_viridis(
+    name = "season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 9),
+        legend.position = "None") 
+
+ggsave("season.png", plot = season_eda)
+```
+
+#### Hour
+```{r}
+hour_eda =
+finaldat %>%
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
+  labs(
+    x = " ", 
+    y = "Mean response time (min)"
+    ) +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE)
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = "None") 
+
+ggsave("hour.png", plot = hour_eda)
+```
+
+
+## Street closure data 
+```{r}
+street_closure_2017 <-  
+  read_csv('data/Street_Closures_due_to_construction_activities_by_Intersection.csv') %>% 
+  janitor::clean_names() %>% 
+  #recode date/time
+  mutate(work_start_date = mdy_hms(work_start_date),
+         work_end_date = mdy_hms(work_end_date),
+         work_time = round(difftime(work_end_date, work_start_date, 
+                                    units = 'days'), 0)) %>% 
+  #select year 2017
+  filter(year(work_start_date) == 2017) %>% 
+  select(-purpose) %>% 
+  na.omit() %>% 
+  mutate(A = toupper(str_replace_all(onstreetname, fixed(" "), "")),
+         B = toupper(str_replace_all(fromstreetname, fixed(" "), "")))
+save(street_closure_2017, file = "data/street_closure_2017.RData")
+```
+
+
+## Add street closure data and create subset data for UWS and WH
+```{r}
+#list of streets of intereste
+street_zip <- read_excel('street_junctions_zipcode.xlsx') %>% 
+  #delete white space from street name 
+  mutate(A = toupper(str_replace_all(street_A, fixed(" "), "")),
+         B = toupper(str_replace_all(street_B, fixed(" "), "")))
+# Extract street closure data based on street_zip
+#Merge A to A and B to B
+first_set <- street_zip %>% 
+  inner_join(street_closure_2017, by = c("A", "B"))
+#Merge A to B and B to A
+second_set <- street_zip %>% 
+  inner_join(street_closure_2017, by = c("A" = 'B', 'B' = "A"))
+street_closure_UWS_WH <- first_set %>% 
+  bind_rows(second_set) %>% 
+  select(street_A:neighborhood, work_start_date:work_time)
+#Create function that checks the closure duration whether it happens while the call was made
+check_street_closure <- function(datetime, zip){
+  #Filter only the zipcode of interest
+  zipcode_closure <- street_closure_UWS_WH %>% 
+    filter(zipcode == zip) %>% 
+    mutate(street_closed = ifelse(work_start_date < datetime & work_end_date > datetime, 1, 0))
+  
+  if( sum(zipcode_closure$street_closed) > 0){
+    return(1)
+  } else {return(0)}
+}
+#Then create variable street closure (y/n) in the incident_dat_2017 focusing on Washington heights and UWS
+dat_subset <- finaldat %>%
+  filter(zip_code %in% c(10023, 10024, 10025, 10032, 10033, 10040)) 
+#Down to 6065 observations
+dat_subset$street_closed <- NA
+for (i in 1:nrow(dat_subset)) {
+  dat_subset$street_closed[i] <- 
+    check_street_closure(dat_subset$incident_date_time[i], zip = dat_subset$zip_code[i])
+}
+save(dat_subset, file = "data/subset_dat.RData")
+```
+
+```{r}
+
+dat_subset %>% 
+  mutate(street_closed = as.factor(street_closed)) %>% 
+  ggplot(aes(x = neighborhood, y = response_time, color = street_closed)) + 
+  geom_boxplot()+
+  ylim(0, 20)
+#actually the difference is really small.  
 ```

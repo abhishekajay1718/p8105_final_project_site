@@ -11,7 +11,7 @@
 
 
 
-<title>COMMIT</title>
+<title>Exploratory Data Analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -321,14 +321,29 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">COMMIT</h1>
+<h1 class="title toc-ignore">Exploratory Data Analysis</h1>
 
 </div>
 
 
-<div id="about-this-page" class="section level3">
-<h3>About this page</h3>
-<p>Mission: make apoorva commit!</p>
+<p>In order to figure out the association between response time and each explanatory variables, exploratory data analysis was performed.</p>
+<div id="weather" class="section level3">
+<h3>Weather</h3>
+<img src="prcp_snow.png" style="width:75%" class = "center">
+</center>
+<p>Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time as much as snow is.</p>
+</div>
+<div id="season" class="section level3">
+<h3>Season</h3>
+<img src="season.png" style="width:75%" "height: auto" class = "center">
+</center>
+<p>Mean response time is slightly increased in winter, which may be explained along with snow variable.</p>
+</div>
+<div id="hour-of-the-day" class="section level3">
+<h3>Hour of the day</h3>
+<img src="hour.png" style="width:75%" "height: auto" class = "center">
+</center>
+<p>It seems that response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.</p>
 </div>
 
 

@@ -1,63 +1,14 @@
 ---
 title: "Factors associated with response time of emergency medical service(EMS) in New York City"
-output:
-  html_document:
-    toc: true
-    toc_float: true
-    css: style.css
+output: html_document
 ---
-
 Youn Kyeong Chang (yc3242), Pengxuan Chen(pc2853), Anusorn Thanataveerat (at2710), Apoorva Srinivasan (as5697), Abhishek Ajay (aa4266)
 
-#Overview
 
-**Insert screencast**
+<img src="./EMS.jpg" style="width:90%" class = "center"></center>
 
-#Background and Objective
+image from: https://www.nytimes.com/2017/12/31/nyregion/fire-department-medical-emergencies-times-square-nyc.html
 
-Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. 
 
-<a href = "https://europepmc.org/articles/pmc32251">
-Effect of reducing ambulance response times on deaths from out of hospital cardiac arrest: cohort study</a>
 
-Currently, the ambulance service has a statutory obligation to arrive at the scene of 50% of emergency calls within 7 minutes and 90% within 14 minutes. The government is considering reducing this target to 90% within 8 minutes.3 Another way to reduce delays would be for other first responders, such as firefighters, the police, or community volunteers, to be supplied with “intelligent” defibrillators within a medically controlled system.4 The fire service, for example, has more stations than the ambulance service to allow it to meet its more stringent targets—90% of vehicles are required to attend the scene of a fire within 5 minutes of the emergency call.
 
-<a href = "https://www.ncbi.nlm.nih.gov/pubmed/22026820">Emergency medical services response time and mortality in an urban setting.</a>
-
-Modern emergency medical services (EMS) is the first level of health care response for out-of-hospital medical emergencies. Historically, one of the first
-interventions that prehospital personnel performed was rapid response to a scene and rapid return of a patient to hospital by use of lights and siren.
-
-<a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a>
-
-This study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. This got us interested in exploring the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
-
-#Methods
-
-##Data Source
-
-<a href = "https://europepmc.org/articles/pmc32251">
-Effect of reducing ambulance response times on deaths from out of hospital cardiac arrest: cohort study</a>
-
-<a href = "https://www.ncbi.nlm.nih.gov/pubmed/22026820">Emergency medical services response time and mortality in an urban setting.</a>
-
-<a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a>
-
-##Statistical Analyses
-
-We assess the average response time of emergency medical service by calculating the time difference between call and arrival across all neighborhoods in NYC. Upon looking at the profile of the response time all through the year, we carry out a log-transformation of the response time (// comment on use of box cox?)
-
-Multiple linear regression models have been fit on to predictors such as time of day, day of week and weather to see the variation in log of response times. 
-
-We carry out another hypothesis testing of the difference in the average response time within Upper West Side and Washington Heights. 
-
-Null Hypothesis: There is not difference between the response times in the two neighborhoods
-
-Alternate Hypothesis: There is.
-
-##Results
-
-kfneoinf
-
-#Conclusions 
-
-lkmfkfm

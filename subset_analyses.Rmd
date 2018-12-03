@@ -1,0 +1,140 @@
+---
+title: "Subset analysis"
+author: ""
+date: "December 1, 2018"
+output: html_document
+---
+
+
+<a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a>
+
+This study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. This got us interested in exploring the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+library(magick)
+library(broom)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+theme_set(theme_bw())
+```
+
+```{r finaldata, include = FALSE}
+load('data/subset_dat.RData') 
+
+subset <- dat_subset %>% 
+  #Only retain variables of interest
+  select(response_time, neighborhood, season:street_closed) %>% 
+  #recode neightborhood (washington as opposed to Inwood + washington heights)
+  mutate(neighborhood = ifelse(neighborhood == 'Inwood and Washington Heights',
+      'Washington Heights', neighborhood)) %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
+         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
+         season = fct_relevel(season, "Spring"),
+         hour_of_day = fct_relevel(hour_of_day, "night"))
+```
+
+## Logistic regression with among UWS
+```{r}
+uws_dat <- subset %>% filter(neighborhood == 'Upper West Side')
+fit_logistic_uws =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = uws_dat)
+
+summary(fit_logistic_uws)
+```
+
+## Logistic regression with among Washington heights
+```{r}
+wash_dat <- subset %>% filter(neighborhood == 'Washington Heights')
+
+fit_logistic_wash =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
+      family = binomial(), data = wash_dat)
+
+summary(fit_logistic_wash)
+```
+
+
+```{r}
+#Prepare table for visualization
+table_results_uws <-  fit_logistic_uws %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_uws))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
+         neightborhood = 'UWS') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_uws %>% 
+  knitr::kable(digits = 3, "html") %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+```{r}
+table_results_wash <-  fit_logistic_wash %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_wash))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed"),
+         neightborhood = 'Washington Heights') %>% 
+  mutate(term = factor(term, levels = as.ordered(term)))
+table_results_wash %>% 
+  knitr::kable(digits = 3, "html") %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+
+```{r plot_OR}
+OR_UWS =
+ggplot(table_results_uws, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
+
+OR_WASH =
+ggplot(table_results_wash, aes(x = term, y = OR)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+  coord_flip()
+  
+OR_all <- 
+  table_results_uws %>% bind_rows(table_results_wash) %>% 
+  ggplot(., aes(x = term, y = OR, colour = neightborhood)) +
+  geom_hline(aes(yintercept = 1), size = 1, linetype = "dashed") +
+     geom_pointrange(aes(ymin = conf.low, ymax = conf.high), 
+     position = position_dodge(width = 0.30)) +
+     coord_flip() + xlab('') + ylab('Odds ratio') 
+ggsave("OR_all.png", plot = OR_all, width = 45, height = 25, units = "cm")
+```
+
+# Fitting regression model by neightborhood
+On UWS, high precipitation is associated with lower odds of response times greater than 8 minutes. What's interesting here is why? Street closure is associated with the outcome but not statistically significant.
+Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. 
+-It's either linking street closure to the zip code in this case is too broad or street closure did not really play a role in response time- 
+
+
+```{r}
+fit_logistic_neighbor =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed + neighborhood, family = binomial(), data = subset)
+
+summary(fit_logistic_neighbor)
+
+fit_logistic_neighbor %>% 
+    broom::tidy() %>% 
+  mutate(OR = exp(estimate)) %>%
+  bind_cols(.,  exp(confint_tidy(fit_logistic_neighbor))) %>% 
+  select(term, OR, conf.low, conf.high) %>% 
+  filter(term != '(Intercept)') %>% 
+  mutate(term = c("Fall", "Summer", "Winter", "Afternoon", "Dawn", "Morning", "snow 50+", "snow 50-", "prcp 25+", "prcp 25-", "Street closed", "Washington Heights"))
+
+```
+Washington Height has 1.05 times the odds of response time greater than 8 minutes compared to UWS. However the observed effect is not statistically significant.
+
