@@ -5,6 +5,12 @@ date: "December 1, 2018"
 output: html_document
 ---
 
+
+<a href = "https://www.ncbi.nlm.nih.gov/pubmed/29381111">Neighborhood Poverty and 9-1-1 Ambulance Response Time.</a>
+
+This study done in California county early this year challenges the commonly held assumption that ambulances are later to poor neighborhoods. This got us interested in exploring the relationship in emergency response time between a economically well off area - Upper West Side and a relatively poorer area such as Washington Heigths. 
+
+
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(kableExtra)
