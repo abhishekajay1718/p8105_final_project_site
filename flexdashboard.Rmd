@@ -1,0 +1,75 @@
+---
+title: "Visualisations for EMS Response Time as a function of different predictors"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(p8105.datasets)
+library(tidyverse)
+library(plotly)
+library(viridis)
+library(forcats)
+```
+
+We will use the NOAA data set.
+
+```{r data_import_tidying}
+nyc_weather_2017 = 
+  rnoaa::meteo_pull_monitors("USW00094728", 
+                             var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
+                             date_min = "2017-01-01", 
+                             date_max = "2017-12-31"
+                             ) %>% 
+  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10)
+```
+
+Since the data set is quite huge with 1,417,635 entries, we remove all the NAs from precipitation, minimum temperature and maximum temperature and then take random 5000 samples from it by setting seed as 1.
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+###WEATHER EDA
+
+```{r scatter_plot}
+
+tmax_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~tmax, type = "scatter", mode = "lines", alpha = 0.5, name = "tmax") 
+  
+tmin_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~tmin, type = "scatter", mode = "lines", alpha = 0.5, name = "tmin")
+
+snow_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~snow, type = "scatter", mode = "lines", alpha = 0.5, name = "snow") 
+  
+snwd_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~snwd, type = "scatter", mode = "lines", alpha = 0.5, name = "snwd")
+  
+prcp_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~prcp, type = "scatter", mode = "lines", alpha = 0.5, name = "prcp") 
+
+subplot(tmax_plot, tmin_plot, snow_plot, snwd_plot, prcp_plot, nrows = 3)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+###
+
+```{r box_plot}
+
+```
+
+###
+
+```{r bar_plot}
+```
+
