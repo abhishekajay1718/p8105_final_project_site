@@ -1,17 +1,16 @@
+
 ---
-title: "Shiny"
+title: "Shiny Dashboard"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: row
+    orientation: columns
+    vertical_layout: fill
 runtime: shiny
-
 ---
-
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(plotly)
-library(shiny)
 library(tidyverse)
 library(lubridate)
 library(patchwork)
@@ -20,6 +19,7 @@ library(rvest)
 library(viridis)
 library(grid)
 library(rvest)
+library(shiny)
 
 load('data/finaldat.RData')
 
@@ -80,10 +80,10 @@ radioButtons("season_choice", label = h3("Choose season"),
     selected = "Winter")
 ```
 
-Column {data-width=650}
+Row 
 -----------------------------------------------------------------------
 
-### Chart A
+### Response time by borough 
 
 ```{r}
 renderPlotly({ 
@@ -97,6 +97,24 @@ renderPlotly({
 ```
 
 
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
 
+### Response time by hour
+
+```{r}
+renderPlotly({ 
+  finaldat_8min_zip_coor %>%
+    filter(borough == input$borough_choice, season == input$season_choice) %>%
+    group_by(zip_code) %>%
+    mutate(response_time = as.numeric(response_time)) %>%
+  mutate(mean_res_time = mean(response_time)) %>% 
+     mutate(text_label = str_c("Hour:", hour, " o'clock")) %>% 
+  plot_ly(x = ~hour, y = ~mean_res_time, type = "bar", 
+          alpha = 0.5, 
+          text = ~text_label) 
+  
+})
+```
 
 
