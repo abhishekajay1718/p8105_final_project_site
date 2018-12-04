@@ -23,6 +23,27 @@ library(rvest)
 
 load('data/finaldat.RData')
 
+finaldat = finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high"))) %>%
+  
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter")))
+  
+ 
+
 finaldat_8min =
   finaldat %>% 
   mutate(over_8min = ifelse(response_time > 8, "8min+", "8min-"), over_8min = as.factor(over_8min))
@@ -51,6 +72,12 @@ boros = finaldat_8min_zip_coor %>% distinct(borough) %>% pull()
 # selectInput widget
 selectInput("borough_choice", label = h3("Select boro"),
             choices = boros, selected = "Manhattan")
+
+season = finaldat_8min_zip_coor %>% distinct(season) %>% pull()
+# radioButtons widget
+radioButtons("season_choice", label = h3("Choose season"),
+    choices = season, 
+    selected = "Winter")
 ```
 
 Column {data-width=650}
@@ -61,13 +88,17 @@ Column {data-width=650}
 ```{r}
 renderPlotly({ 
   finaldat_8min_zip_coor %>%
-    filter(borough == input$borough_choice) %>%
+    filter(borough == input$borough_choice, season == input$season_choice) %>%
     group_by(zip_code) %>%
   plot_ly(x = ~lat, y = ~long, type = "scatter", mode = "markers",
           alpha = 0.5, 
           color = ~over_8min)
   
+
 })
 ```
+
+
+
 
 
