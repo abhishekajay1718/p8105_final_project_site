@@ -92,9 +92,7 @@ renderPlotly({
     group_by(zip_code) %>%
   plot_ly(x = ~lat, y = ~long, type = "scatter", mode = "markers",
           alpha = 0.5, 
-          color = ~over_8min)
-  
-
+          color = ~over_8min) 
 })
 ```
 
