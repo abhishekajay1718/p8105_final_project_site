@@ -8,12 +8,12 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-library(p8105.datasets)
 library(tidyverse)
 library(plotly)
 library(viridis)
 library(forcats)
 ```
+
 Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
 
 ```{r data_import_tidying, echo = FALSE}
@@ -47,13 +47,12 @@ finaldat =
          over_8min = fct_relevel(over_8min, "8min-")) 
 ```
 
-
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-##Variation of Mean Response Time with hour of day (per season)
+### Variation of Mean Response Time over different hours of days through the year, per season
 
-```{r box_plot}
+```{r}
 hour_eda =
   finaldat %>%
   group_by(hour, season) %>% 
@@ -80,9 +79,9 @@ ggplotly(hour_eda)
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-###WEATHER EDA
+### Variation of Weather through the years
 
-```{r scatter_plot}
+```{r}
 tmax_plot = 
   nyc_weather_2017 %>% 
   plot_ly(x = ~date, y = ~tmax, type = "scatter", mode = "lines", alpha = 0.5, name = "tmax") 
@@ -102,9 +101,53 @@ prcp_plot =
 subplot(tmax_plot, tmin_plot, snow_plot, prcp_plot, nrows = 3, titleY = T)
 ```
 
-###
+### Variation of response time with varying extent of snowy days
 
-```{r bar_plot}
+```{r}
+prcp_eda =
+  finaldat %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%   group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Rainy conditions",
+    y = "Mean response time(min)",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-25(mm)", "25(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Precipitation",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 9),
+        legend.position = "None") 
 
+snow_eda =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>%   group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
+  geom_violin(aes(fill = snow_ctg), alpha = .3) +
+  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
+  labs(
+    title = "Snowy conditions",
+    y = "Mean response time(min)",
+    x = " "
+  ) +
+  scale_x_discrete(labels = c("0(mm)", "0-50(mm)", "50(mm)+")) +
+  viridis::scale_fill_viridis(
+    name = "Snow",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 12),
+        axis.title.y = element_text(size = 9),
+        axis.text.x = element_text(size = 8),
+        legend.position = "None") 
+
+prcp_snow = prcp_eda + snow_eda 
+
+ggplotly(prcp_snow)
 ```
 
