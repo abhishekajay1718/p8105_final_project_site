@@ -10,32 +10,24 @@ output:
 library(flexdashboard)
 library(tidyverse)
 library(plotly)
-
-install.packages("ggmap")
-
-
 library(maps)
 library(mapdata)
 library(viridis)
-library(sp)
-library(rgdal)
-library(rgeos)
 library(ggthemes)
-library(forcats)
+library(lubridate)
+library(patchwork)
+library(kableExtra)
+library(magick)
+library(jpeg)
+library(grid)
+
 ```
 
 Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
 
 ```{r data_import_tidying, echo = FALSE}
-nyc_weather_2017 = 
-  rnoaa::meteo_pull_monitors("USW00094728", 
-                             var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
-                             date_min = "2017-01-01", 
-                             date_max = "2017-12-31"
-                             ) %>% 
-  mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10)
-
 load('data/finaldat.RData')
+load("data/incident_zip_coor.RData")
 
 finaldat = 
   finaldat %>%
@@ -56,7 +48,17 @@ finaldat =
            if_else((snow > 0 & snow <= 50), "low", "high")),
          over_8min = fct_relevel(over_8min, "8min-")) 
 
+ny = map_data("county", "new york")
 
+ny_1 = 
+  ny %>% 
+  filter(subregion %in% c("kings", "bronx", "richmond", "new york", "queens"))
+
+incident_zip_coor = 
+  incident_zip_coor %>%
+  group_by(zip_code) %>% 
+  mutate(response_time = as.numeric(response_time)) %>%
+  mutate(mean_res_time = mean(response_time))
 ```
 
 Column {data-width=650}
@@ -94,37 +96,26 @@ Column {data-width=350}
 ### Variation of Weather through the years
 
 ```{r}
-ny = map_data('state', region = "new york")
+map_plot = 
+  ggplot() + 
+  geom_polygon(data = ny_1, aes(x = long, y = lat, group = group, fill = subregion)) +
+  geom_point(data = incident_zip_coor, aes(x = long, y = lat, color = mean_res_time)) +
+  viridis::scale_color_viridis()
 
-ny_1 = 
-  ny %>% 
-  filter(subregion %in% c("manhattan", "long island", "staten island"))
+#nyc_pic = readJPEG("nyc-boroughs-map.jpg")
 
-ggplot() + geom_polygon(data = ny_1, 
-                        aes(x = long, y = lat, group = group)) +
-           coord_fixed(1.3)
+#map_plot = 
+#  incident_zip_coor %>% 
+#  ggplot(aes(x = long, y = lat, size = mean_res_time, color = mean_res_time)) +
+#  annotation_custom(rasterGrob(nyc_pic, 
+#                               width = unit(1,"npc"), 
+#                               height = unit(1,"npc")), 
+#                               -Inf, Inf, -Inf, Inf) +
+#  geom_point() +
+#  viridis::scale_color_viridis() + theme_set(theme_bw() + theme(legend.position = "bottom"))
 
-ggplot() + geom_polygon(data = ny_1, 
-                        aes(x = long, y = lat, group = group)) +
-           coord_fixed(1.3)
 
-tmax_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~tmax, type = "scatter", mode = "lines", alpha = 0.5, name = "tmax") 
-
-tmin_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~tmin, type = "scatter", mode = "lines", alpha = 0.5, name = "tmin") 
-
-snow_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~snow, type = "scatter", mode = "lines", alpha = 0.5, name = "snow")
-
-prcp_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~prcp, type = "scatter", mode = "lines", alpha = 0.5, name = "prcp")
-
-subplot(tmax_plot, tmin_plot, snow_plot, prcp_plot, nrows = 3, titleY = T)
+ggplotly(map_plot)
 ```
 
 ### Variation of response time with varying extent of snowy days
