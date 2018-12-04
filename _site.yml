@@ -17,6 +17,8 @@ navbar:
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg
       href: https://github.com/dewyork/P8105_final_project
+    -text: "Shiny"
+    href: Shiny
 output:
   html_document:
     theme: journal
