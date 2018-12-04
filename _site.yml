@@ -7,6 +7,8 @@ navbar:
       href: Introduction.html
     - text: "EDA"
       href: EDA_site.html
+    - text: "Shiny"
+      href: ./shiny_dashboard/app.R
     - text: "Result"
       href: statistical_analysis_site.html
     - text: "Conclusion"
