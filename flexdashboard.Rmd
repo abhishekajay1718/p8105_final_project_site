@@ -115,7 +115,7 @@ map_plot =
 #  viridis::scale_color_viridis() + theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 
-ggplotly(map_plot)
+#ggplotly(map_plot)
 ```
 
 ### Variation of response time with varying extent of snowy days

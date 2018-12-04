@@ -589,7 +589,9 @@ save(dat_subset, file = "data/subset_dat.RData")
 
 #### step 4-3 Logistic regression and visualization with among UWS and Washington Heights
 ```{r}
-uws_dat <- subset %>% filter(neighborhood == 'Upper West Side')
+uws_dat <- dat_subset %>% 
+  filter(neighborhood == 'Upper West Side')
+
 fit_logistic_uws =
   glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg + street_closed, 
       family = binomial(), data = uws_dat)
