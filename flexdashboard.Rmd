@@ -27,7 +27,7 @@ nyc_weather_2017 =
   mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10)
 ```
 
-Since the data set is quite huge with 1,417,635 entries, we remove all the NAs from precipitation, minimum temperature and maximum temperature and then take random 5000 samples from it by setting seed as 1.
+Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
 
 Column {data-width=650}
 -----------------------------------------------------------------------
