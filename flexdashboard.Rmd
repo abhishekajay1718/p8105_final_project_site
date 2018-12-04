@@ -14,10 +14,9 @@ library(plotly)
 library(viridis)
 library(forcats)
 ```
+Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
 
-We will use the NOAA data set.
-
-```{r data_import_tidying}
+```{r data_import_tidying, echo = FALSE}
 nyc_weather_2017 = 
   rnoaa::meteo_pull_monitors("USW00094728", 
                              var = c("PRCP", "TMIN", "TMAX", "SNOW", "SNWD"), 
@@ -25,51 +24,87 @@ nyc_weather_2017 =
                              date_max = "2017-12-31"
                              ) %>% 
   mutate(tmin = tmin/10, tmax = tmax/10, prcp = prcp/10)
+
+load('data/finaldat.RData')
+
+finaldat = 
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         over_8min = fct_relevel(over_8min, "8min-")) 
 ```
 
-Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
 
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-###WEATHER EDA
+##Variation of Mean Response Time with hour of day (per season)
 
-```{r scatter_plot}
-
-tmax_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~tmax, type = "scatter", mode = "lines", alpha = 0.5, name = "tmax") 
+```{r box_plot}
+hour_eda =
+  finaldat %>%
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
+  labs(
+    x = " ", 
+    y = "Mean response time (min)"
+    ) +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = "None") 
   
-tmin_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~tmin, type = "scatter", mode = "lines", alpha = 0.5, name = "tmin")
-
-snow_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~snow, type = "scatter", mode = "lines", alpha = 0.5, name = "snow") 
-  
-snwd_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~snwd, type = "scatter", mode = "lines", alpha = 0.5, name = "snwd")
-  
-prcp_plot = 
-  nyc_weather_2017 %>% 
-  plot_ly(x = ~date, y = ~prcp, type = "scatter", mode = "lines", alpha = 0.5, name = "prcp") 
-
-subplot(tmax_plot, tmin_plot, snow_plot, snwd_plot, prcp_plot, nrows = 3)
+ggplotly(hour_eda)
 ```
 
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-###
+###WEATHER EDA
 
-```{r box_plot}
+```{r scatter_plot}
+tmax_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~tmax, type = "scatter", mode = "lines", alpha = 0.5, name = "tmax") 
 
+tmin_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~tmin, type = "scatter", mode = "lines", alpha = 0.5, name = "tmin") 
+
+snow_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~snow, type = "scatter", mode = "lines", alpha = 0.5, name = "snow")
+
+prcp_plot = 
+  nyc_weather_2017 %>% 
+  plot_ly(x = ~date, y = ~prcp, type = "scatter", mode = "lines", alpha = 0.5, name = "prcp")
+
+subplot(tmax_plot, tmin_plot, snow_plot, prcp_plot, nrows = 3, titleY = T)
 ```
 
 ###
 
 ```{r bar_plot}
+
 ```
 
