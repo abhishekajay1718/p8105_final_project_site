@@ -22,7 +22,7 @@ library(grid)
 
 ```
 
-Variation of EMS Response Time
+**Variation of EMS Response Time (Click on each EDA Plot to see it)**
 
 ```{r data_import_tidying, echo = FALSE}
 load('data/finaldat.RData')
@@ -77,24 +77,96 @@ fit_logistic %>%
   filter(ctg != "intercept")  
 
 adj = .2 # This is used in position_nudge to move the dots
-
-#ny = map_data("county", "new york")
-
-#ny_1 = 
-#  ny %>% 
-#  filter(subregion %in% c("kings", "bronx", "richmond", "new york", "queens"))
-
-#incident_zip_coor = 
-#  incident_zip_coor %>%
-#  group_by(zip_code) %>% 
-#  mutate(response_time = as.numeric(response_time)) %>%
-#  mutate(mean_res_time = mean(response_time))
-#Column {data-width=500}
 ```
+
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### **EDA Plot 1:** The response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.
+
+```{r EDA_1}
+hour_eda =
+  finaldat %>%
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
+  labs(
+    x = " ", 
+    y = "Mean response time (min)"
+    ) +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = "None") 
+  
+ggplotly(hour_eda)
+```
+
+### **EDA Plot 2:** Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time as much as snow is.
+
+```{r EDA_2}
+prcp_eda_plotly =
+  finaldat %>%
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%
+  group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>%
+  plot_ly( x = ~prcp_ctg, y = ~mean_resp_time, split = ~prcp_ctg, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T),
+           legendgroup = "Rainy Conditions") %>% 
+  layout(showlegend = TRUE,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Categorical Precipitation"))
+
+snow_eda_plotly =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>% 
+  group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>%
+  plot_ly( x = ~snow_ctg, y = ~mean_resp_time, split = ~snow_ctg, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T), 
+           legendgroup = "Snowy Conditions") %>% 
+  layout(showlegend = T,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Categorical Snowfall"))
+
+subplot(prcp_eda_plotly, snow_eda_plotly, titleY = T, margin = 0.01, shareY = T, titleX = T)
+```
+
+### **EDA Plot 3:** Mean response time is slightly increased in winter, which may be explained along with snow variable.
+
+```{r EDA_3}
+finaldat %>% 
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
+  group_by(date, season) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  plot_ly( x = ~season, y = ~mean_resp_time, split = ~season, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T),
+           legendgroup = "Seasons") %>% 
+  layout(showlegend = TRUE,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Seasons"))
+```
+
 
 Row
 ----------------------------------------------------------------------------
-### **Result Plot:** Odds Ratio with respect to weather, rain and hour of day.
+### **Result Plot:** Odds Ratio with respect to weather, rain and hour of day. From **snow**, as expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm (low) snow and 47% by over 50mm snow (high). In **season**, as compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%. For **rain statistically**, significant result was not obtained from rain variable and it matches the result of EDA. For **hour of the day**, in reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 
 ```{r result_plot}
 OR =
@@ -180,174 +252,6 @@ OR =
        y = " ") +
   theme_bw() 
 
-#OR + theme(panel.grid.minor = element_blank(),
-#        axis.title.x = element_text(size = 16),
-#        axis.text.x = element_text(size = 16),
-#        axis.text.y = element_text(size = 20),
-#        legend.position = "None") 
-
-
-
 ggplotly(OR)
 ```
-
-Row {.tabset .tabset-fade}
------------------------------------------------------------------------
-
-### **EDA Plot 1:** The response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.
-
-```{r EDA_1}
-hour_eda =
-  finaldat %>%
-  group_by(hour, season) %>% 
-  ggplot(aes(x = hour, y = response_time, color = season)) + 
-  geom_smooth(se = FALSE) +
-  scale_x_continuous(breaks = c(6, 12, 18),
-                     labels = c("6am", "12pm", "18pm")) +
-  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
-  labs(
-    x = " ", 
-    y = "Mean response time (min)"
-    ) +
-   viridis::scale_color_viridis(
-    name = "Season",
-    discrete = TRUE) +
-  theme(plot.title = element_text(size = 13),
-        axis.title.y = element_text(size = 10),
-        axis.text.x = element_text(size = 12),
-        legend.position = "None") 
-  
-ggplotly(hour_eda)
-```
-
-### **EDA Plot 2:** Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time as much as snow is.
-
-```{r EDA_2}
-prcp_eda_plotly =
-  finaldat %>%
-  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%
-  group_by(date, prcp_ctg) %>% 
-  summarise(mean_resp_time = mean(response_time)) %>%
-  plot_ly( x = ~prcp_ctg, y = ~mean_resp_time, split = ~prcp_ctg, type = 'violin', 
-           box = list( visible = T),
-           meanline = list(visible = T),
-           legendgroup = "Rainy Conditions") %>% 
-  layout(showlegend = TRUE,
-    yaxis = list(
-      title = "Mean Response Time (mins)"),
-    xaxis = list(
-      title = "Categorical Precipitation"))
-
-snow_eda_plotly =
-  finaldat %>% 
-  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>% 
-  group_by(date, snow_ctg) %>% 
-  summarise(mean_resp_time = mean(response_time)) %>%
-  plot_ly( x = ~snow_ctg, y = ~mean_resp_time, split = ~snow_ctg, type = 'violin', 
-           box = list( visible = T),
-           meanline = list(visible = T), 
-           legendgroup = "Snowy Conditions") %>% 
-  layout(showlegend = T,
-    yaxis = list(
-      title = "Mean Response Time (mins)"),
-    xaxis = list(
-      title = "Categorical Snowfall"))
-
-subplot(prcp_eda_plotly, snow_eda_plotly, titleY = T, margin = 0.01, shareY = T, titleX = T)
-```
-
-### **EDA Plot 3:** Mean response time is slightly increased in winter, which may be explained along with snow variable.
-
-```{r EDA_3}
-finaldat %>% 
-  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
-  group_by(date, season) %>% 
-  summarise(mean_resp_time = mean(response_time)) %>% 
-  plot_ly( x = ~season, y = ~mean_resp_time, split = ~season, type = 'violin', 
-           box = list( visible = T),
-           meanline = list(visible = T),
-           legendgroup = "Seasons") %>% 
-  layout(showlegend = TRUE,
-    yaxis = list(
-      title = "Mean Response Time (mins)"),
-    xaxis = list(
-      title = "Seasons"))
-```
-
-<!--
-
-Column {data-width=500}
------------------------------------------------------------------------
-
-### Mean Response Time Distribution over all of NYC -- Visualised.
-
-
-#map_plot = 
-#  ggplot() + 
-#  geom_polygon(data = ny_1, aes(x = long, y = lat, group = group, fill = subregion)) +
-#  geom_point(data = incident_zip_coor, aes(x = long, y = lat, color = mean_res_time)) +
-#  viridis::scale_color_viridis()
-
-#nyc_pic = readJPEG("nyc-boroughs-map.jpg")
-
-#map_plot = 
-#  incident_zip_coor %>% 
-#  ggplot(aes(x = long, y = lat, size = mean_res_time, color = mean_res_time)) +
-#  annotation_custom(rasterGrob(nyc_pic, 
-#                               width = unit(1,"npc"), 
-#                               height = unit(1,"npc")), 
-#                               -Inf, Inf, -Inf, Inf) +
-#  geom_point() +
-#  viridis::scale_color_viridis() + theme_set(theme_bw() + theme(legend.position = "bottom"))
-
-
-#ggplotly(map_plot) 
-
-
-prcp_eda =
-  finaldat %>% 
-  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%   group_by(date, prcp_ctg) %>% 
-  summarise(mean_resp_time = mean(response_time)) %>% 
-  ggplot(aes(x = prcp_ctg, y = mean_resp_time)) +
-  geom_violin(aes(fill = prcp_ctg), alpha = .3) +
-  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
-  labs(
-    title = "Rainy conditions",
-    y = "Mean response time(min)",
-    x = " "
-  ) +
-  scale_x_discrete(labels = c("0(mm)", "0-25(mm)", "25(mm)+")) +
-  viridis::scale_fill_viridis(
-    name = "Precipitation",
-    discrete = TRUE) +
-  theme(plot.title = element_text(size = 12),
-        axis.title.y = element_text(size = 8),
-        axis.text.x = element_text(size = 9),
-        legend.position = "None") 
-
-snow_eda =
-  finaldat %>% 
-  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>%   group_by(date, snow_ctg) %>% 
-  summarise(mean_resp_time = mean(response_time)) %>% 
-  ggplot(aes(x = snow_ctg, y = mean_resp_time)) +
-  geom_violin(aes(fill = snow_ctg), alpha = .3) +
-  stat_summary(fun.y = mean, geom = "point", size = 2, color = "blue") +
-  labs(
-    title = "Snowy conditions",
-    y = "Mean response time(min)",
-    x = " "
-  ) +
-  scale_x_discrete(labels = c("0(mm)", "0-50(mm)", "50(mm)+")) +
-  viridis::scale_fill_viridis(
-    name = "Snow",
-    discrete = TRUE) +
-  theme(plot.title = element_text(size = 12),
-        axis.title.y = element_text(size = 9),
-        axis.text.x = element_text(size = 8),
-        legend.position = "None") 
-
-prcp_snow = prcp_eda + snow_eda 
-
-ggplotly(prcp_snow)
---!>
 
