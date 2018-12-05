@@ -58,4 +58,6 @@ For this project, we were interested in how street closures in NYC affects the r
 ###Limitations of our analysis:
 
 
-* response time 'clock' almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.
+Response time 'clock' almost universally stops when the unit arrives in front of the address; in large office or apartment buildings, actually accessing the patient may take several minutes longer, but this is not considered in response time calculation or reporting.
+
+
