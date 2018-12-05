@@ -24,7 +24,7 @@ Due to its large population, New York City requires a powerful, quick, well-equi
 
 __Incidents Responded to by Fire Companies:__
 [https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd] 
-This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. The original dataset contains 24 columns from which our aim outcome variable is __response time__ which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.
+This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. 
 
 
 __The New York City Weather Data__ [https://www.ncdc.noaa.gov/cdo-web/datasets] 
@@ -36,10 +36,10 @@ __Street Closure due to Construction data__ :
 [https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk]
 For this project, we were interested in how street closures in NYC affects the response time. For this, we have acquired DOT Street Closure Data. DOT Street Closure data identifies locations in the New York City Street Closure map where a street is subject to a full closure, restricting through traffic, for the purpose of conducting construction related activity on a City street. From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.
 
-Additionally, since the original street closure data is recorded based on street junctions, and there is not a zipcode variable included, we need to connect zipcode to every street junction in the dataset in order to merge it with the incident data. This required a lot of work, and thus we only did it with two neighborhood areas, the UWS and Washington Heights. We matched the neighbourhood table given [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes, for us to filter the selected neighborhood in both the incident and the street closure data. 
+ [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes, for us to filter the selected neighborhood in both the incident and the street closure data. 
 
 
-Since these datasets were obtained from different sources, incident data and weather data were merged together by the "date" variable. Further, incident data was seperated into day,month and year variables which helped us categorise different seasons by month, time of day(morning, evening etc.). A seperate variable was name categorizing response time above or below 8 mins since it is generally accepted within the field that an 'ideal' response time for emergency calls would be within eight minutes, ninety-percent of the time. Precipitation from weather data was also categorized into high, medium and low to conduct our analysis on. A new dataset was created to contain the incident data and the variable listed above. both the incident data and street closure data have been filtered by two neighborhood, Washington Heights and Upper West Side, to merged with each other. Another dataset was created as a subset to contain the two variables. 
+
 
 
 ###Questions that drove our analysis:
