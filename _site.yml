@@ -5,10 +5,10 @@ navbar:
   right:
     - text: "Introduction"
       href: Introduction.html
-    - text: "Result"
-      href: statistical_analysis_site.html
-    - text: "Result & EDA Dashboard"
+    - text: "EDA vs Result Dashboard"
       href: flexdashboard.html
+    - text: "Conclusion"
+      href: statistical_analysis_site.html
     - text: "Shiny"
       href: https://apoorvasrinivasan.shinyapps.io/P8105_shiny/
     - icon: fa-envelope fa-lg
