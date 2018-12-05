@@ -5,7 +5,7 @@ navbar:
   right:
     - text: "Introduction"
       href: Introduction.html
-    - text: "EDA vs Result Dashboard"
+    - text: "EDA and Result Dashboard"
       href: flexdashboard.html
     - text: "Conclusion"
       href: statistical_analysis_site.html

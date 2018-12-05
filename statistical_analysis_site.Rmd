@@ -41,14 +41,6 @@ We fitted regression model by neighborhood and here is our findings:
 * The null result from street closure could be due to either linking street closure to the zip code in this case is too broad or street closure did not really play a role in our response time.
 * The model with neighborhood as predictor variable tells us that Washington Heights had 1.05 times the odds of response time greater than 8 minutes compared to the Upper West Side. However the observed effect is not statistically significant. At least we can be rest assured whether where we live, we still receive equal treatment from the emergency dispatcher.
 
-###Conclusions and future scope
 
-* From our analysis, we found that New York City had satisfactory medical emergency response time(~5.5mins) overall in 2017. As expected, the response time increases when there's snow (winter) however precipitation doesn't affect it. To our pleseant surprise, street closure doesn't affect the response time as well. 
-* On comparing response time in Upper West Side and Washington Heights specifically, there were some associations between street closure and precipitation. However, none were statistically significant.
-
-__Future scope__ 
-
-* Having established that the emergency response time is relatively satisfactory in New York City, this opens up questions about the qualifications of the emergency responders and what type of care providers at different levels are allowed to provide.
-
-* Another area to explore would be to investiage if all the response vehicles have the necessary equipments to deal with any emergency situation to best increase survival rate.
-
+###Final conclusion:
+We found out that in snowy conditions, the odds of over 8min response increases while rainy rainy conduition does not effect on the outcome. Along with this result, the odds of over 8min response increased in winter and it may be linked to snow factor. Also, response time was also affected by when the event happened. We tried to connect these results with the traffic because we expected that if traffic is heavier due to snow or when response happened, the response time will be delayed. But it was hard to visulize this expectation due to the difficulty of matching the location of event and the traffic. From our results, we can recommend the plan such as assigning more ambulances in snowy conditions and during the day.   
