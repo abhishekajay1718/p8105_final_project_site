@@ -130,87 +130,79 @@ Column {data-width=500}
 OR =
   ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg, 
                         label = sub_ctg_chr)) +
-  geom_vline(aes(xintercept = 1), size = 1, linetype = "dashed") +
-  geom_vline(aes(xintercept = 1.5), size = .6, linetype = "dashed") +
+  geom_vline(aes(xintercept = 1), linetype = "dashed") +
+  geom_vline(aes(xintercept = 1.5), linetype = "dashed") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "1"), 
-                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "1"),
-            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
+            aes(label = sub_ctg_chr), colour = "seagreen4", 
             nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
-             size = 6, color = "seagreen4",
+             color = "seagreen4",
              position = position_nudge(y = adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "2"), 
-                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "2"),
-            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            aes(label = sub_ctg_chr), colour = "indianred4", 
             nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
-  geom_point(data = filter(OR_total_df, sub_ctg == "2"), 
-             size = 6, color = "indianred4") +
+  geom_point(data = filter(OR_total_df, sub_ctg == "2"), color = "indianred4") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
-                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "3"),
-            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
+            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
             nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
-  geom_point(data = filter(OR_total_df, sub_ctg == "3"), 
-             size = 6, color = "lavenderblush4",
+  geom_point(data = filter(OR_total_df, sub_ctg == "3"), color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "4"), 
-                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = +.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "4"),
-            aes(label = sub_ctg_chr), size = 6, colour = "skyblue2", 
+            aes(label = sub_ctg_chr), colour = "skyblue2", 
             nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
-             size = 6, color = "skyblue2",
+             color = "skyblue2",
              position = position_nudge(y = +.1)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "5"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                  height = .1, 
                  color = "gray50", position = position_nudge(y = -.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "5"),
-            aes(label = sub_ctg_chr), size = 6, colour = "skyblue4", 
-            nudge_x = -.16, nudge_y = -.1) +
+            aes(label = sub_ctg_chr), colour = "skyblue4", 
+            nudge_x = -.15, nudge_y = -.1) +
   geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
-             size = 6, color = "skyblue4", 
+             color = "skyblue4", 
              position = position_nudge(y = -.1)) +
  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 height = .1, 
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "6"),
-            aes(label = sub_ctg_chr), size = 6, colour = "seagreen4", 
-            nudge_x = -.14, nudge_y = +.2, check_overlap = TRUE) +
+            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            nudge_x = -.13, nudge_y = +.3, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
-             size = 6, color = "seagreen4",
+              color = "seagreen4",
              position = position_nudge(y = adj)) +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "7"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                  height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "7"),
-            aes(label = sub_ctg_chr), size = 6, colour = "indianred4", 
+            aes(label = sub_ctg_chr), colour = "indianred4", 
             nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
-             size = 6, color = "indianred4") +
+             color = "indianred4") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
-                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
-                 size = .5, height = .1, 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "8"),
-            aes(label = sub_ctg_chr), size = 6, colour = "lavenderblush4", 
-            nudge_x = -.13, nudge_y = -.2, check_overlap = TRUE) +  
-  geom_point(data = filter(OR_total_df, sub_ctg == "8"), 
-             size = 6, color = "lavenderblush4",
+            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.27, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "8"), color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
   scale_x_continuous(breaks = c(1, 1.5),
                      limits = c(.7, 1.8)) +
