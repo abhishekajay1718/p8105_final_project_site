@@ -46,7 +46,11 @@ finaldat =
          snow_ctg = 
            if_else(snow == 0, "no_snow",
            if_else((snow > 0 & snow <= 50), "low", "high")),
-         over_8min = fct_relevel(over_8min, "8min-")) 
+         over_8min = fct_relevel(over_8min, "8min-")) %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
+         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
+         season = fct_relevel(season, "Spring"),
+         hour_of_day = fct_relevel(hour_of_day, "night"))
 
 fit_logistic =
   glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
@@ -120,7 +124,7 @@ ggplotly(hour_eda)
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Odds Ratio with respect to weather
+### Odds Ratio with respect to weather, rain and hour of day.
 
 ```{r}
 OR =
@@ -212,12 +216,15 @@ OR =
                      limits = c(.7, 1.8)) +
   labs(x = "Odds Ratio",
        y = " ") +
-  theme_bw() +
-  theme(panel.grid.minor = element_blank(),
-        axis.title.x = element_text(size = 16),
-        axis.text.x = element_text(size = 16),
-        axis.text.y = element_text(size = 20),
-        legend.position = "None") 
+  theme_bw() 
+
+#OR + theme(panel.grid.minor = element_blank(),
+#        axis.title.x = element_text(size = 16),
+#        axis.text.x = element_text(size = 16),
+#        axis.text.y = element_text(size = 20),
+#        legend.position = "None") 
+
+
 
 ggplotly(OR)
 ```
