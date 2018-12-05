@@ -23,7 +23,7 @@ library(grid)
 
 ```
 
-Here we showcase a dhasboard of the various plots that led us to come up with the analysis.
+On the left we have the visualisation of the daily profile of mean response time through the year per season. While on the right, we look at the response time as a categorical variable with it having two levels: less than 8 minutes and more than 8 minutes and look at at its distribution for snowy days, season, rain and hour of day.
 
 ```{r data_import_tidying, echo = FALSE}
 load('data/finaldat.RData')
@@ -137,7 +137,7 @@ OR =
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "1"),
-            aes(label = sub_ctg_chr), colour = "seagreen4", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "seagreen4", 
             nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
              color = "seagreen4",
@@ -146,14 +146,14 @@ OR =
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "2"),
-            aes(label = sub_ctg_chr), colour = "indianred4", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "indianred4", 
             nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "2"), color = "indianred4") +
   geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "3"),
-            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "lavenderblush4", 
             nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
   geom_point(data = filter(OR_total_df, sub_ctg == "3"), color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
@@ -161,7 +161,7 @@ OR =
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = +.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "4"),
-            aes(label = sub_ctg_chr), colour = "skyblue2", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "skyblue2", 
             nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
              color = "skyblue2",
@@ -171,7 +171,7 @@ OR =
                   height = .1, 
                  color = "gray50", position = position_nudge(y = -.1)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "5"),
-            aes(label = sub_ctg_chr), colour = "skyblue4", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "skyblue4", 
             nudge_x = -.15, nudge_y = -.1) +
   geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
              color = "skyblue4", 
@@ -182,8 +182,8 @@ OR =
                  color = "gray50", 
                  position = position_nudge(y = adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "6"),
-            aes(label = sub_ctg_chr), colour = "seagreen4", 
-            nudge_x = -.13, nudge_y = +.3, check_overlap = TRUE) +
+            aes(label = sub_ctg_chr), size = 2.3, colour = "seagreen4", 
+            nudge_x = -.13, nudge_y = +.18, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
               color = "seagreen4",
              position = position_nudge(y = adj)) +
@@ -192,7 +192,7 @@ OR =
                   height = .1, 
                  color = "gray50") +
   geom_text(data = filter(OR_total_df, sub_ctg == "7"),
-            aes(label = sub_ctg_chr), colour = "indianred4", 
+            aes(label = sub_ctg_chr), size = 2.3, colour = "indianred4", 
             nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
   geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
              color = "indianred4") +
@@ -200,8 +200,8 @@ OR =
                  aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
                  color = "gray50", position = position_nudge(y = -adj)) +
   geom_text(data = filter(OR_total_df, sub_ctg == "8"),
-            aes(label = sub_ctg_chr), colour = "lavenderblush4", 
-            nudge_x = -.13, nudge_y = -.27, check_overlap = TRUE) +  
+            aes(label = sub_ctg_chr), size = 2.3, colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.25, check_overlap = TRUE) +  
   geom_point(data = filter(OR_total_df, sub_ctg == "8"), color = "lavenderblush4",
              position = position_nudge(y = -adj)) +
   scale_x_continuous(breaks = c(1, 1.5),
