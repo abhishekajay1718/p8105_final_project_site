@@ -10,7 +10,7 @@ navbar:
     - text: "Result & EDA Dashboard"
       href: flexdashboard.html
     - text: "Shiny"
-      href: https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/ 
+      href: https://apoorvasrinivasan.shinyapps.io/P8105_shiny/
     - icon: fa-envelope fa-lg
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg
