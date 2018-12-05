@@ -289,16 +289,13 @@ div.tocify {
   <a href="Introduction.html">Introduction</a>
 </li>
 <li>
-  <a href="EDA_site.html">EDA</a>
+  <a href="flexdashboard.html">EDA vs Result Dashboard</a>
 </li>
 <li>
-  <a href="statistical_analysis_site.html">Result</a>
+  <a href="statistical_analysis_site.html">Conclusion</a>
 </li>
 <li>
-  <a href="conclusion_site.html">Conclusion</a>
-</li>
-<li>
-  <a href="flexdashboard.html">Data Dashboard</a>
+  <a href="https://apoorvasrinivasan.shinyapps.io/P8105_shiny/">Shiny</a>
 </li>
 <li>
   <a href="mailto:&lt;abhishek.ajay@columbia.edu&gt;">
@@ -344,6 +341,28 @@ div.tocify {
 <p><strong>Season</strong> Compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%.</p>
 <p><strong>Rain</strong> Statistically significant result was not obtained from rain variable and it matches the result of EDA.</p>
 <p><strong>Hour of the day</strong> In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.</p>
+</div>
+<div id="subset-analysis" class="section level3">
+<h3>Subset analysis</h3>
+<p>We fitted regression model by neighborhood and here is our findings: <img src="OR_all.png" style="width:90%" ></p>
+<ul>
+<li>On Upper West Side, high precipitation is associated with lower odds of response times greater than 8 minutes.</li>
+<li>Street closure is associated with the outcome but not statistically significant. Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome.</li>
+<li>The null result from street closure could be due to either linking street closure to the zip code in this case is too broad or street closure did not really play a role in our response time.</li>
+<li>The model with neighborhood as predictor variable tells us that Washington Heights had 1.05 times the odds of response time greater than 8 minutes compared to the Upper West Side. However the observed effect is not statistically significant. At least we can be rest assured whether where we live, we still receive equal treatment from the emergency dispatcher.</li>
+</ul>
+</div>
+<div id="conclusions-and-future-scope" class="section level3">
+<h3>Conclusions and future scope</h3>
+<ul>
+<li>From our analysis, we found that New York City had satisfactory medical emergency response time(~5.5mins) overall in 2017. As expected, the response time increases when there’s snow (winter) however precipitation doesn’t affect it. To our pleseant surprise, street closure doesn’t affect the response time as well.</li>
+<li>On comparing response time in Upper West Side and Washington Heights specifically, there were some associations between street closure and precipitation. However, none were statistically significant.</li>
+</ul>
+<p><strong>Future scope</strong></p>
+<ul>
+<li><p>Having established that the emergency response time is relatively satisfactory in New York City, this opens up questions about the qualifications of the emergency responders and what type of care providers at different levels are allowed to provide.</p></li>
+<li><p>Another area to explore would be to investiage if all the response vehicles have the necessary equipments to deal with any emergency situation to best increase survival rate.</p></li>
+</ul>
 </div>
 
 

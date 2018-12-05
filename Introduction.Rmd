@@ -5,7 +5,8 @@ output:
     toc: true
     toc_float: true
 ---
-### Motivation:
+###Motivation:
+
 A major concern in emergency medical services (EMS) planning has been the need to minimize response time to better patient outcome, translated by some EMS operations into a goal of a response time of 8 minutes or less for advanced life support (ALS) units responding to life-threatening events. Several research results suggested there may be a small beneficial effect of response ≤7 minutes 59 seconds for those who survived to become an inpatient. More information on this can be found [here](https://www.ncbi.nlm.nih.gov/pubmed/11927452) and [here](https://www.ncbi.nlm.nih.gov/pubmed/22026820)
 
 Therefore, to find out what factors are assoicated response time could be the first step to reduce the response time. Due to its large population, New York City requires a powerful, quick, well-equipped and effective Emergency Medical Service System. Hence, we explored the data of EMS response time in New York City in the year 2017 with respect to weather, time and street blockage.
@@ -15,7 +16,10 @@ Therefore, to find out what factors are assoicated response time could be the fi
 
 __Incidents Responded to by Fire Companies:__
 [https://data.cityofnewyork.us/Public-Safety/Incidents-Responded-to-by-Fire-Companies/tm6d-hbzd] 
+
 This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. The original dataset contains 24 columns from which our aim outcome variable is __response time__ which was obtained by subtracting incident time and arrival time. We are also interested in area(borough and zipcode) and street highway.
+
+This dataset contains detailed information on incidents handled by FDNY Fire units and includes fire, medical and non-fire emergencies. For this project, we have filtered only EMS related data. The data is collected in the New York Fire Incident Reporting System (NYFIRS), which is structured by the FDNY to provide data to the National Fire Incident Reporting System (NFIRS). NFIRS is a modular all-incident reporting system designed by the U.S. Fire Administration. 
 
 
 __The New York City Weather Data__ [https://www.ncdc.noaa.gov/cdo-web/datasets] 
@@ -26,7 +30,9 @@ __Street Closure due to Construction data__ :
 [https://data.cityofnewyork.us/Transportation/Street-Closures-due-to-construction-activities-by-/478a-yykk]
 From this datset of 7 columns, we have filtered out work state and end date in 2017, on and from street and borough code for our interest.
 
-Additionally, since the original street closure data is recorded based on street junctions, and there is not a zipcode variable included, we need to connect zipcode to every street junction in the dataset in order to merge it with the incident data. This required a lot of work, and thus we only did it with two neighborhood areas, the UWS and Washington Heights. We matched the neighbourhood table given [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes, for us to filter the selected neighborhood in both the incident and the street closure data. 
+ [here](https://www.health.ny.gov/statistics/cancer/registry/appendix/neighborhoods.htm?fbclid=IwAR3N4VlKC1OehRZyEuDYPEAE7AFAEXXIRC11seIBKxA-0fd3g4hL0QvnV20) with the zip codes, for us to filter the selected neighborhood in both the incident and the street closure data. 
 
-###Final conclusion:
-We found out that in snowy conditions, the odds of over 8min response increases while rainy rainy conduition does not effect on the outcome. Along with this result, the odds of over 8min response increased in winter and it may be linked to snow factor. Also, response time was also affected by when the event happened. We tried to connect these results with the traffic because we expected that if traffic is heavier due to snow or when response happened, the response time will be delayed. But it was hard to visulize this expectation due to the difficulty of matching the location of event and the traffic. From our results, we can recommend the plan such as assigning more ambulances in snowy conditions and during the day.   
+
+
+
+

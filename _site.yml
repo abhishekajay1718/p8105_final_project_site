@@ -5,14 +5,12 @@ navbar:
   right:
     - text: "Introduction"
       href: Introduction.html
-    - text: "EDA"
-      href: EDA_site.html
-    - text: "Result"
-      href: statistical_analysis_site.html
-    - text: "Conclusion"
-      href: conclusion_site.html
-    - text: "Data Dashboard"
+    - text: "EDA and Result Dashboard"
       href: flexdashboard.html
+    - text: "Conclusion"
+      href: statistical_analysis_site.html
+    - text: "Shiny"
+      href: https://apoorvasrinivasan.shinyapps.io/P8105_shiny/
     - icon: fa-envelope fa-lg
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg

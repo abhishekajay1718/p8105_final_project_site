@@ -1,0 +1,257 @@
+---
+title: "Visualisations for EMS Response Time as a function of different predictors"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(maps)
+library(mapdata)
+library(viridis)
+library(ggthemes)
+library(lubridate)
+library(patchwork)
+library(kableExtra)
+library(magick)
+library(jpeg)
+library(grid)
+
+```
+
+**Variation of EMS Response Time (Click on each EDA Plot to see it)**
+
+```{r data_import_tidying, echo = FALSE}
+load('data/finaldat.RData')
+load("data/incident_zip_coor.RData")
+
+finaldat = 
+  finaldat %>%
+  mutate(season = 
+           ifelse(incident_month %in% 9:11, "Fall",
+           ifelse(incident_month %in% c(12,1,2), "Winter",
+           ifelse(incident_month %in% 3:5, "Spring", "Summer"))), 
+         hour_of_day = 
+           ifelse(hour %in% 6:11, "morning",
+           ifelse(hour %in% 12:17, "afternoon",
+           ifelse(hour %in% 18:23, "night","dawn"))), 
+         over_8min = ifelse(response_time > 8, "8min+", "8min-"),
+         prcp_ctg = 
+           if_else(prcp == 0, "no_prcp",
+           if_else((prcp > 0 & prcp <= 25), "low", "high")),
+         snow_ctg = 
+           if_else(snow == 0, "no_snow",
+           if_else((snow > 0 & snow <= 50), "low", "high")),
+         over_8min = fct_relevel(over_8min, "8min-")) %>% 
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, "no_prcp"),
+         snow_ctg = fct_relevel(snow_ctg, "no_snow"),
+         season = fct_relevel(season, "Spring"),
+         hour_of_day = fct_relevel(hour_of_day, "night"))
+
+fit_logistic =
+  glm(over_8min ~ season + hour_of_day + snow_ctg + prcp_ctg, 
+      family = binomial(), data = finaldat)
+
+OR_total_df = 
+fit_logistic %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_CI_OR = exp(estimate - 1.96*std.error),
+         upper_CI_OR = exp(estimate + 1.96*std.error)) %>% 
+  select(term, OR, lower_CI_OR, upper_CI_OR) %>%
+  as.tibble() %>% 
+  mutate(ctg = c("intercept", 
+                 "Season", "Season", "Season", 
+                 "Hour of the day", "Hour of the day", "Hour of the day",
+                 "Snow", "Snow",
+                 "Rain", "Rain"),
+         sub_ctg_chr = c("intercept",
+                     "Fall", "Summer", "Winter",
+                     "Afternoon", "Dawn", "Morning",
+                     "50(mm)+", "0-50(mm)",
+                     "25(mm)+", "0-25(mm)"),
+         sub_ctg = c("1", "2", "1", "3", "8", "6", "7", "5", "4", "5", "4")) %>%   
+  filter(ctg != "intercept")  
+
+adj = .2 # This is used in position_nudge to move the dots
+```
+
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### **EDA Plot 1:** The response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.
+
+```{r EDA_1}
+hour_eda =
+  finaldat %>%
+  group_by(hour, season) %>% 
+  ggplot(aes(x = hour, y = response_time, color = season)) + 
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = c(6, 12, 18),
+                     labels = c("6am", "12pm", "18pm")) +
+  geom_vline(xintercept = c(6, 12, 18), color = "darkred") +
+  labs(
+    x = " ", 
+    y = "Mean response time (min)"
+    ) +
+   viridis::scale_color_viridis(
+    name = "Season",
+    discrete = TRUE) +
+  theme(plot.title = element_text(size = 13),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 12),
+        legend.position = "None") 
+  
+ggplotly(hour_eda)
+```
+
+### **EDA Plot 2:** Both precipitation and snow are categorized into three categories according to the amount. It appears that precipitation is not correlated with response time as much as snow is.
+
+```{r EDA_2}
+prcp_eda_plotly =
+  finaldat %>%
+  mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%
+  group_by(date, prcp_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>%
+  plot_ly( x = ~prcp_ctg, y = ~mean_resp_time, split = ~prcp_ctg, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T),
+           legendgroup = "Rainy Conditions") %>% 
+  layout(showlegend = TRUE,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Categorical Precipitation"))
+
+snow_eda_plotly =
+  finaldat %>% 
+  mutate(snow_ctg = fct_relevel(snow_ctg, c("no_snow", "low", "high"))) %>% 
+  group_by(date, snow_ctg) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>%
+  plot_ly( x = ~snow_ctg, y = ~mean_resp_time, split = ~snow_ctg, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T), 
+           legendgroup = "Snowy Conditions") %>% 
+  layout(showlegend = T,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Categorical Snowfall"))
+
+subplot(prcp_eda_plotly, snow_eda_plotly, titleY = T, margin = 0.01, shareY = T, titleX = T)
+```
+
+### **EDA Plot 3:** Mean response time is slightly increased in winter, which may be explained along with snow variable.
+
+```{r EDA_3}
+finaldat %>% 
+  mutate(season = fct_relevel(season, c("Spring", "Summer", "Fall", "Winter"))) %>% 
+  group_by(date, season) %>% 
+  summarise(mean_resp_time = mean(response_time)) %>% 
+  plot_ly( x = ~season, y = ~mean_resp_time, split = ~season, type = 'violin', 
+           box = list( visible = T),
+           meanline = list(visible = T),
+           legendgroup = "Seasons") %>% 
+  layout(showlegend = TRUE,
+    yaxis = list(
+      title = "Mean Response Time (mins)"),
+    xaxis = list(
+      title = "Seasons"))
+```
+
+
+Row
+----------------------------------------------------------------------------
+### **Result Plot:** Odds Ratio with respect to weather, rain and hour of day. From **snow**, as expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm (low) snow and 47% by over 50mm snow (high). In **season**, as compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%. For **rain statistically**, significant result was not obtained from rain variable and it matches the result of EDA. For **hour of the day**, in reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
+
+```{r result_plot}
+OR =
+  ggplot(OR_total_df, aes(x = OR, y = ctg, color = sub_ctg, 
+                        label = sub_ctg_chr)) +
+  geom_vline(aes(xintercept = 1), linetype = "dashed") +
+  geom_vline(aes(xintercept = 1.5), linetype = "dashed") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "1"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "1"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "seagreen4", 
+            nudge_x = -.1, nudge_y = +.2, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "1"), 
+             color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "2"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "2"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "indianred4", 
+            nudge_x = -.1, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "2"), color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "3"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "3"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "lavenderblush4", 
+            nudge_x = -.1, nudge_y = -.2, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "3"), color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "4"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
+                 color = "gray50", position = position_nudge(y = +.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "4"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "skyblue2", 
+            nudge_x = -.15, nudge_y = +.1, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "4"), 
+             color = "skyblue2",
+             position = position_nudge(y = +.1)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "5"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                  height = .1, 
+                 color = "gray50", position = position_nudge(y = -.1)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "5"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "skyblue4", 
+            nudge_x = -.15, nudge_y = -.1) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "5"), 
+             color = "skyblue4", 
+             position = position_nudge(y = -.1)) +
+ geom_errorbarh(data = filter(OR_total_df, sub_ctg == "6"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                 height = .1, 
+                 color = "gray50", 
+                 position = position_nudge(y = adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "6"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "seagreen4", 
+            nudge_x = -.13, nudge_y = +.18, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "6"), 
+              color = "seagreen4",
+             position = position_nudge(y = adj)) +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "7"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), 
+                  height = .1, 
+                 color = "gray50") +
+  geom_text(data = filter(OR_total_df, sub_ctg == "7"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "indianred4", 
+            nudge_x = -.13, nudge_y = 0, check_overlap = TRUE) +
+  geom_point(data = filter(OR_total_df, sub_ctg == "7"), 
+             color = "indianred4") +
+  geom_errorbarh(data = filter(OR_total_df, sub_ctg == "8"), 
+                 aes(xmax = upper_CI_OR, xmin = lower_CI_OR), height = .1, 
+                 color = "gray50", position = position_nudge(y = -adj)) +
+  geom_text(data = filter(OR_total_df, sub_ctg == "8"),
+            aes(label = sub_ctg_chr), size = 2.3, colour = "lavenderblush4", 
+            nudge_x = -.13, nudge_y = -.25, check_overlap = TRUE) +  
+  geom_point(data = filter(OR_total_df, sub_ctg == "8"), color = "lavenderblush4",
+             position = position_nudge(y = -adj)) +
+  scale_x_continuous(breaks = c(1, 1.5),
+                     limits = c(.7, 1.8)) +
+  labs(x = "Odds Ratio",
+       y = " ") +
+  theme_bw() 
+
+ggplotly(OR)
+```
+

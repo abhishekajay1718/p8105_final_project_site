@@ -1,5 +1,5 @@
 ---
-title: "Factors associated with response time of emergency medical service(EMS) in New York City"
+title: "Factors Associated with Response Time of Emergency Medical Service(EMS) in New York City in 2017"
 output: html_document
 ---
 Youn Kyeong Chang (yc3242), Pengxuan Chen(pc2853), Anusorn Thanataveerat (at2710), Apoorva Srinivasan (as5697), Abhishek Ajay (aa4266)

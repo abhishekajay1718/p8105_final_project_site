@@ -32,3 +32,15 @@ $$
 **Hour of the day**
   In reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 
+### Subset analysis
+We fitted regression model by neighborhood and here is our findings:
+<img src="./OR_all.png" style="width:90%" >
+
+* On Upper West Side, high precipitation is associated with lower odds of response times greater than 8 minutes. 
+* Street closure is associated with the outcome but not statistically significant. Washington Heights, on the other hand, saw afternoon and dawn time, compared to the night time as reference, as contributing factors to the response time greater than 8 minutes with ORs 1.6 and 1.3, respectively. Again street closure is not predictive of the outcome. 
+* The null result from street closure could be due to either linking street closure to the zip code in this case is too broad or street closure did not really play a role in our response time.
+* The model with neighborhood as predictor variable tells us that Washington Heights had 1.05 times the odds of response time greater than 8 minutes compared to the Upper West Side. However the observed effect is not statistically significant. At least we can be rest assured whether where we live, we still receive equal treatment from the emergency dispatcher.
+
+
+###Final conclusion:
+We found out that in snowy conditions, the odds of over 8min response increases while rainy rainy conduition does not effect on the outcome. Along with this result, the odds of over 8min response increased in winter and it may be linked to snow factor. Also, response time was also affected by when the event happened. We tried to connect these results with the traffic because we expected that if traffic is heavier due to snow or when response happened, the response time will be delayed. But it was hard to visulize this expectation due to the difficulty of matching the location of event and the traffic. From our results, we can recommend the plan such as assigning more ambulances in snowy conditions and during the day.   
