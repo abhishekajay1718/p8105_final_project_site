@@ -1,6 +1,6 @@
 
 ---
-title: "Shiny Dashboard"
+title: "Shiny"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
