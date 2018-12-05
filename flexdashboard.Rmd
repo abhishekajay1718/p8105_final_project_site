@@ -75,17 +75,17 @@ fit_logistic %>%
 
 adj = .2 # This is used in position_nudge to move the dots
 
-ny = map_data("county", "new york")
+#ny = map_data("county", "new york")
 
-ny_1 = 
-  ny %>% 
-  filter(subregion %in% c("kings", "bronx", "richmond", "new york", "queens"))
+#ny_1 = 
+#  ny %>% 
+#  filter(subregion %in% c("kings", "bronx", "richmond", "new york", "queens"))
 
-incident_zip_coor = 
-  incident_zip_coor %>%
-  group_by(zip_code) %>% 
-  mutate(response_time = as.numeric(response_time)) %>%
-  mutate(mean_res_time = mean(response_time))
+#incident_zip_coor = 
+#  incident_zip_coor %>%
+#  group_by(zip_code) %>% 
+#  mutate(response_time = as.numeric(response_time)) %>%
+#  mutate(mean_res_time = mean(response_time))
 ```
 
 Column {data-width=500}
@@ -116,6 +116,9 @@ hour_eda =
   
 ggplotly(hour_eda)
 ```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
 
 ### Odds Ratio with respect to weather
 
@@ -218,20 +221,19 @@ OR =
 
 ggplotly(OR)
 ```
-
+<!--
 
 Column {data-width=500}
 -----------------------------------------------------------------------
 
 ### Mean Response Time Distribution over all of NYC -- Visualised.
 
-```{r map_plot}
 
-map_plot = 
-  ggplot() + 
-  geom_polygon(data = ny_1, aes(x = long, y = lat, group = group, fill = subregion)) +
-  geom_point(data = incident_zip_coor, aes(x = long, y = lat, color = mean_res_time)) +
-  viridis::scale_color_viridis()
+#map_plot = 
+#  ggplot() + 
+#  geom_polygon(data = ny_1, aes(x = long, y = lat, group = group, fill = subregion)) +
+#  geom_point(data = incident_zip_coor, aes(x = long, y = lat, color = mean_res_time)) +
+#  viridis::scale_color_viridis()
 
 #nyc_pic = readJPEG("nyc-boroughs-map.jpg")
 
@@ -246,12 +248,9 @@ map_plot =
 #  viridis::scale_color_viridis() + theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 
-ggplotly(map_plot)
-```
+#ggplotly(map_plot) 
 
-### Variation of response time with varying extent of snowy days
 
-```{r}
 prcp_eda =
   finaldat %>% 
   mutate(prcp_ctg = fct_relevel(prcp_ctg, c("no_prcp", "low", "high"))) %>%   group_by(date, prcp_ctg) %>% 
@@ -297,5 +296,5 @@ snow_eda =
 prcp_snow = prcp_eda + snow_eda 
 
 ggplotly(prcp_snow)
-```
+--!>
 
