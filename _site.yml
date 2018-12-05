@@ -5,13 +5,11 @@ navbar:
   right:
     - text: "Introduction"
       href: Introduction.html
-    - text: "EDA"
-      href: EDA_site.html
     - text: "Result"
       href: statistical_analysis_site.html
     - text: "Conclusion"
       href: conclusion_site.html
-    - text: "Data Dashboard"
+    - text: "Result & EDA Dashboard"
       href: flexdashboard.html
     - text: "Shiny"
       href: https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/ 
