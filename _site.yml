@@ -7,8 +7,6 @@ navbar:
       href: Introduction.html
     - text: "Result"
       href: statistical_analysis_site.html
-    - text: "Conclusion"
-      href: conclusion_site.html
     - text: "Result & EDA Dashboard"
       href: flexdashboard.html
     - text: "Shiny"
