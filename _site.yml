@@ -5,6 +5,8 @@ navbar:
   right:
     - text: "Introduction"
       href: Introduction.html
+    - text: "Shiny"
+      href: https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/
     - text: "EDA"
       href: EDA_site.html
     - text: "Result"
@@ -17,9 +19,6 @@ navbar:
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg
       href: https://github.com/dewyork/P8105_final_project
-    - text: "Shiny"
-      href: https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/
-      
 output:
   html_document:
     theme: journal
