@@ -6,7 +6,7 @@ navbar:
     - text: "Introduction"
       href: Introduction.html
     - text: "Shiny"
-      href: https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/{target="_blank"}
+      href: (https://apoorvasrinivasan.shinyapps.io/shiny_dashboard/){target="_blank"}
     - text: "EDA"
       href: EDA_site.html
     - text: "Result"
