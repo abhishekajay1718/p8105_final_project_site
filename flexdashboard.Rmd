@@ -1,8 +1,7 @@
 ---
 title: "Visualisations for EMS Response Time as a function of different predictors"
 output: 
-  flexdashboard::flex_dashboard:
-    orientation: rows
+  flexdashboard::flex_dashboard
 ---
 
 ```{r setup, include=FALSE}
@@ -73,7 +72,7 @@ adj = .2 # This is used in position_nudge to move the dots
 ```
 
 
-Row {.tabset .tabset-fade}
+Column {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
 ### **EDA Plot 1:** The response is delayed peak around 5 am and getting improved. Based on this result, hour of the day will be categorized into dawn, morning, afternoon and night.
@@ -157,7 +156,7 @@ finaldat %>%
 ```
 
 
-Row
+Column
 ----------------------------------------------------------------------------
 ### **Result Plot:** Odds Ratio with respect to weather, rain and hour of day. From **snow**, as expected from EDA, compared to no snow conditions, odds of over 8min response time is increased 24% by 0~50mm (low) snow and 47% by over 50mm snow (high). In **season**, as compared to Spring, Summer does not affect odds of over 8min response time but odds is increased in Fall by 6% and in Winter by 7%. For **rain statistically**, significant result was not obtained from rain variable and it matches the result of EDA. For **hour of the day**, in reference to night, odds of over 8min response time is increased at dawn by 26%, in the morning by 37% and in the afternoon by 35%.
 
