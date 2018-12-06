@@ -10,8 +10,10 @@ Youn Kyeong Chang (yc3242), Pengxuan Chen(pc2853), Anusorn Thanataveerat (at2710
 image from: https://www.nytimes.com/2017/12/31/nyregion/fire-department-medical-emergencies-times-square-nyc.html
 
 
-<br>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/4CKRTB88DzA" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
 
-<br>
+
+
+<h2>Screencast</h2>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/4CKRTB88DzA" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen class = "center"></iframe>
