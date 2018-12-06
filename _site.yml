@@ -11,6 +11,8 @@ navbar:
       href: statistical_analysis_site.html
     - text: "Shiny"
       href: https://apoorvasrinivasan.shinyapps.io/P8105_shiny/
+    - icon: fa-video fa-lg
+      href: https://youtu.be/4CKRTB88DzA      
     - icon: fa-envelope fa-lg
       href: mailto:<abhishek.ajay@columbia.edu>
     - icon: fa-github fa-lg
