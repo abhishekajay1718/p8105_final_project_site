@@ -9,17 +9,10 @@ output:
 library(flexdashboard)
 library(tidyverse)
 library(plotly)
-library(maps)
-library(mapdata)
 library(viridis)
 library(ggthemes)
 library(lubridate)
 library(patchwork)
-library(kableExtra)
-library(magick)
-library(jpeg)
-library(grid)
-
 ```
 
 **Variation of EMS Response Time (Click on each EDA Plot to see it)**
